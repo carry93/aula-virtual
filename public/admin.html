@@ -14,7 +14,20 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen" class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="card shadow p-4 text-center border-top border-primary border-5" style="width: 350px;">
+            <h3 class="mb-4 text-primary">👨‍🏫 Acceso Docente</h3>
+            <p class="text-muted small mb-3">Introduce tus credenciales para administrar la clase.</p>
+            <input type="text" id="admin-user" class="form-control mb-2" placeholder="Usuario">
+            <input type="password" id="admin-pass" class="form-control mb-3" placeholder="Contraseña">
+            <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()">Entrar al Panel</button>
+            <div id="admin-error" class="text-danger mt-3 fw-bold" style="display: none;">Credenciales incorrectas</div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO DEL PANEL (Oculto hasta hacer login) -->
+    <div class="container" id="admin-content" style="display: none;">
         <!-- Cabecera y Botón de Cierre (Crucial) -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border-start border-primary border-5">
             <h2 class="m-0 text-primary">👨‍🏫 Panel del Profesor</h2>
@@ -66,11 +79,23 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Tarjeta: Gestión de Pases de Entrega -->
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-body">
+                        <h5 class="text-secondary">Pases de Entrega (Alumnos)</h5>
+                        <p class="small text-muted mb-2">Genera un código de un solo uso para autorizar a un estudiante a subirte un archivo.</p>
+                        <button class="btn btn-warning w-100 mb-3 fw-bold text-dark" onclick="generateUploadToken()">+ Generar Pase de Entrega</button>
+                        <ul id="upload-tokens-list" class="list-group list-group-flush mb-0 border rounded">
+                            <li class="list-group-item text-muted text-center">Ningún pase activo</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <!-- PANEL DERECHO: Lista en Vivo de Materiales -->
             <div class="col-md-7">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0 text-secondary">Materiales Compartidos en la Pizarra</h5>
@@ -78,6 +103,17 @@
                         </div>
                         <ul class="list-group" id="materials-list">
                             <li class="list-group-item text-muted text-center py-4 bg-light border-dashed">La pizarra está vacía.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-secondary">📥 Trabajos Recibidos de Alumnos</h5>
+                        </div>
+                        <ul class="list-group" id="submissions-list">
+                            <li class="list-group-item text-muted text-center py-4 bg-light border-dashed">No hay trabajos recibidos.</li>
                         </ul>
                     </div>
                 </div>
@@ -90,8 +126,22 @@
 
     <!-- Lógica del Profesor con Vanilla JavaScript -->
     <script>
-        // Cargar datos actuales desde el backend al abrir la página
-        document.addEventListener('DOMContentLoaded', loadStatus);
+        // No cargamos los datos hasta que se inicie sesión
+
+        function adminLogin() {
+            const user = document.getElementById('admin-user').value.trim();
+            const pass = document.getElementById('admin-pass').value.trim();
+
+            if (user === 'profesorcito' && pass === 'Edu.25694050.') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                loadStatus(); // Cargar los datos del backend ahora sí
+            } else {
+                const err = document.getElementById('admin-error');
+                err.style.display = 'block';
+                setTimeout(() => err.style.display = 'none', 3000);
+            }
+        }
 
         async function loadStatus() {
             try {
@@ -99,6 +149,8 @@
                 const data = await res.json();
                 renderTokens(data.activeTokens);
                 renderMaterials(data.materials);
+                if(data.uploadTokens) renderUploadTokens(data.uploadTokens);
+                if(data.studentSubmissions) renderSubmissions(data.studentSubmissions);
             } catch (e) {
                 console.error('Error de conexión:', e);
             }
@@ -114,6 +166,38 @@
             list.innerHTML = '';
             tokens.forEach(t => {
                 list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-4 letter-spacing-1 bg-light">${t}</li>`;
+            });
+        }
+
+        function renderUploadTokens(tokens) {
+            const list = document.getElementById('upload-tokens-list');
+            if (tokens.length === 0) {
+                list.innerHTML = '<li class="list-group-item text-muted text-center">Ningún pase activo</li>';
+                return;
+            }
+            list.innerHTML = '';
+            tokens.forEach(t => {
+                list.innerHTML += `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-light">${t}</li>`;
+            });
+        }
+
+        function renderSubmissions(submissions) {
+            const list = document.getElementById('submissions-list');
+            if (submissions.length === 0) {
+                list.innerHTML = '<li class="list-group-item text-muted text-center py-4 bg-light border-dashed">No hay trabajos recibidos.</li>';
+                return;
+            }
+            list.innerHTML = '';
+            submissions.forEach(s => {
+                list.innerHTML += `
+                    <li class="list-group-item py-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-1">📄 ${s.title}</h6>
+                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success">Descargar</a>
+                        </div>
+                        <small class="text-muted">Pase usado: ${s.tokenUsed}</small>
+                    </li>
+                `;
             });
         }
 
@@ -145,6 +229,12 @@
             const res = await fetch('/api/admin/token', { method: 'POST' });
             const data = await res.json();
             renderTokens(data.activeTokens);
+        }
+
+        async function generateUploadToken() {
+            const res = await fetch('/api/admin/upload-token', { method: 'POST' });
+            const data = await res.json();
+            renderUploadTokens(data.uploadTokens);
         }
 
         // Enviar nuevo enlace
