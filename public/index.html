@@ -49,6 +49,21 @@
                 <button class="btn btn-light border shadow-sm mt-4 w-100 fw-bold text-secondary" onclick="loadMaterials()">
                     🔄 Refrescar Materiales
                 </button>
+
+                <!-- SECCIÓN 3: Enviar Trabajo -->
+                <hr class="my-4">
+                <div class="text-start bg-light p-3 rounded border">
+                    <h5 class="text-secondary mb-3">📤 Enviar Trabajo al Profesor</h5>
+                    <p class="small text-muted mb-2">Necesitas un <strong>Pase de Entrega</strong> para enviar un archivo. Pídeselo al profesor.</p>
+                    <div class="mb-2">
+                        <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: ENTREGA-XXXX)" style="text-transform: uppercase;">
+                    </div>
+                    <div class="mb-3">
+                        <input type="file" id="upload-file" class="form-control">
+                    </div>
+                    <button class="btn btn-warning w-100 fw-bold text-dark" id="btn-submit" onclick="submitWork()">Enviar Trabajo</button>
+                    <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -144,6 +159,51 @@
             el.innerText = msg;
             el.style.display = 'block';
             setTimeout(() => el.style.display = 'none', 4000);
+        }
+
+        // Función para enviar trabajos
+        async function submitWork() {
+            const token = document.getElementById('upload-token').value.trim().toUpperCase();
+            const fileInput = document.getElementById('upload-file');
+            const msgEl = document.getElementById('upload-message');
+            
+            if (!token) return alert('Debes ingresar el Pase de Entrega.');
+            if (!fileInput.files.length) return alert('Debes seleccionar un archivo.');
+
+            const formData = new FormData();
+            formData.append('uploadToken', token);
+            formData.append('file', fileInput.files[0]);
+
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerText = 'Enviando... ⏳';
+            
+            try {
+                const res = await fetch('/api/student/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                msgEl.style.display = 'block';
+                if (res.ok) {
+                    msgEl.className = 'mt-2 text-center text-success fw-bold';
+                    msgEl.innerText = '¡Trabajo enviado con éxito!';
+                    document.getElementById('upload-token').value = '';
+                    fileInput.value = '';
+                } else {
+                    msgEl.className = 'mt-2 text-center text-danger fw-bold';
+                    msgEl.innerText = data.error || 'Error al enviar.';
+                }
+            } catch (e) {
+                msgEl.style.display = 'block';
+                msgEl.className = 'mt-2 text-center text-danger fw-bold';
+                msgEl.innerText = 'Error de conexión.';
+            }
+            
+            btn.disabled = false;
+            btn.innerText = 'Enviar Trabajo';
+            setTimeout(() => msgEl.style.display = 'none', 5000);
         }
     </script>
 </body>
