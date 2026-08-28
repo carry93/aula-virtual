@@ -35,6 +35,8 @@ const upload = multer({ storage });
 // ==========================================
 let activeTokens = []; // Tokens válidos generados por el profesor
 let materials = [];    // Lista de enlaces y archivos físicos
+let uploadTokens = []; // Tokens de un solo uso para que alumnos envíen trabajos
+let studentSubmissions = []; // Lista de trabajos recibidos
 
 // ==========================================
 // MIDDLEWARE DE SEGURIDAD
@@ -91,9 +93,26 @@ app.post('/api/admin/material/file', upload.single('file'), (req, res) => {
     res.json({ message: 'Archivo subido con éxito', material });
 });
 
+// Generar token para permitir que un estudiante envíe un archivo
+app.post('/api/admin/upload-token', (req, res) => {
+    const newToken = 'ENTREGA-' + crypto.randomBytes(2).toString('hex').toUpperCase();
+    uploadTokens.push(newToken);
+    res.json({ token: newToken, uploadTokens });
+});
+
+// Descargar un trabajo recibido de un estudiante
+app.get('/api/admin/download-submission/:id', (req, res) => {
+    const submission = studentSubmissions.find(s => s.id === req.params.id);
+    if (submission && fs.existsSync(submission.path)) {
+        res.download(submission.path, submission.title);
+    } else {
+        res.status(404).send('Archivo no encontrado.');
+    }
+});
+
 // 4. Obtener el estado actual (para refrescar el panel del profesor)
 app.get('/api/admin/status', (req, res) => {
-    res.json({ activeTokens, materials });
+    res.json({ activeTokens, materials, uploadTokens, studentSubmissions });
 });
 
 // 5. CERRAR CLASE (CRÍTICO): Borra memoria y destruye archivos físicos
@@ -101,6 +120,8 @@ app.post('/api/admin/close', (req, res) => {
     // Vaciar variables de la memoria del servidor
     activeTokens = [];
     materials = [];
+    uploadTokens = [];
+    studentSubmissions = [];
 
     // Eliminar los archivos físicamente de la carpeta "uploads"
     fs.readdir(UPLOAD_DIR, (err, files) => {
@@ -156,6 +177,35 @@ app.get('/api/download/:id', requireToken, (req, res) => {
     } else {
         res.status(404).send('Archivo no encontrado. Tal vez el profesor cerró la clase.');
     }
+});
+
+// 4. Subir un trabajo de estudiante (Protegido por token de entrega)
+app.post('/api/student/upload', upload.single('file'), (req, res) => {
+    const { uploadToken } = req.body;
+    
+    // Verificar que el token exista y sea válido
+    if (!uploadToken || !uploadTokens.includes(uploadToken)) {
+        // Borrar el archivo si el token es inválido
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ error: 'Token de entrega inválido o ya fue usado.' });
+    }
+    
+    if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
+
+    const submission = {
+        id: Date.now().toString(),
+        title: req.file.originalname,
+        path: req.file.path,
+        filename: req.file.filename,
+        tokenUsed: uploadToken
+    };
+    
+    studentSubmissions.push(submission);
+    
+    // Eliminar el token para que sea de UN SOLO USO
+    uploadTokens = uploadTokens.filter(t => t !== uploadToken);
+
+    res.json({ message: 'Trabajo enviado con éxito', submission });
 });
 
 // Iniciar servidor
