@@ -17,7 +17,7 @@
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="card shadow p-4 text-center border-top border-primary border-5" style="width: 350px;">
-            <h3 class="mb-4 text-primary">👨‍🏫 Acceso Docente</h3>
+            <h3 class="mb-4 text-primary">Acceso Docente</h3>
             <p class="text-muted small mb-3">Introduce tus credenciales para administrar la clase.</p>
             <input type="text" id="admin-user" class="form-control mb-2" placeholder="Usuario">
             
@@ -35,7 +35,7 @@
     <div class="container" id="admin-content" style="display: none;">
         <!-- Cabecera y Botón de Cierre (Crucial) -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border-start border-primary border-5">
-            <h2 class="m-0 text-primary">👨‍🏫 Panel del Profesor</h2>
+            <h2 class="m-0 text-primary">Panel del Profesor</h2>
             <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
         </div>
 
@@ -115,7 +115,11 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0 text-secondary">📥 Trabajos Recibidos de Alumnos</h5>
+                            <h5 class="mb-0 text-secondary">Trabajos Recibidos de Alumnos</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-success me-2" onclick="downloadAllSubmissions()">⬇️ Descargar Todos</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">🔄 Refrescar</button>
+                            </div>
                         </div>
                         <ul class="list-group" id="submissions-list">
                             <li class="list-group-item text-muted text-center py-4 bg-light border-dashed">No hay trabajos recibidos.</li>
@@ -124,6 +128,10 @@
                 </div>
             </div>
         </div>
+        
+        <footer class="mt-5 mb-3 text-center text-muted small">
+            Creado por Eduardo Becerre Guevara
+        </footer>
     </div>
 
     <!-- Bootstrap JS (necesario para las tabs) -->
@@ -200,6 +208,7 @@
         }
 
         function renderSubmissions(submissions) {
+            window.currentSubmissions = submissions; // Guardamos para la descarga múltiple
             const list = document.getElementById('submissions-list');
             if (submissions.length === 0) {
                 list.innerHTML = '<li class="list-group-item text-muted text-center py-4 bg-light border-dashed">No hay trabajos recibidos.</li>';
@@ -216,6 +225,23 @@
                         <small class="text-muted">Pase usado: ${s.tokenUsed}</small>
                     </li>
                 `;
+            });
+        }
+
+        function downloadAllSubmissions() {
+            if (!window.currentSubmissions || window.currentSubmissions.length === 0) {
+                return alert('No hay trabajos para descargar.');
+            }
+            // Descargar secuencialmente
+            window.currentSubmissions.forEach((s, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = `/api/admin/download-submission/${s.id}`;
+                    a.download = s.title;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 800); // 800ms de retraso entre descargas para que el navegador no las bloquee
             });
         }
 
