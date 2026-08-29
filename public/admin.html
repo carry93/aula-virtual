@@ -129,10 +129,11 @@
         // No cargamos los datos hasta que se inicie sesión
 
         function adminLogin() {
-            const user = document.getElementById('admin-user').value.trim();
+            const user = document.getElementById('admin-user').value.trim().toLowerCase();
             const pass = document.getElementById('admin-pass').value.trim();
 
-            if (user === 'profesorcito' && pass === 'Edu.25694050.') {
+            // Aceptamos la contraseña con o sin el punto final por si hubo un error al copiar/pegar
+            if (user === 'profesorcito' && (pass === 'Edu.25694050' || pass === 'Edu.25694050.')) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 loadStatus(); // Cargar los datos del backend ahora sí
