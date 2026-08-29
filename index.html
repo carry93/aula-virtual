@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula Virtual - Estudiante</title>
+    <!-- Favicon @ -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>@</text></svg>">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { max-width: 600px; margin-top: 80px; }
+        #materials-section { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-sm text-center p-4">
+            <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
+            <h1 class="mb-4 fw-bold text-primary display-5">compuclase.click</h1>
+
+            <!-- SECCIÓN 1: Ingreso de Token -->
+            <div id="login-section">
+                <div class="alert alert-info text-start mb-4">
+                    <strong>Pasos para entrar:</strong>
+                    <ol class="mb-0 mt-1">
+                        <li>Pídele a tu profesor el código de la clase de hoy.</li>
+                        <li>Escríbelo en la casilla que está abajo.</li>
+                        <li>Haz clic en "Ingresar a Clase" para ver y descargar tus materiales.</li>
+                    </ol>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold" placeholder="Ej: 4F2A1B" style="text-transform: uppercase;">
+                </div>
+                <button class="btn btn-primary btn-lg w-100" onclick="login()">Ingresar a Clase</button>
+                <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+
+            <!-- SECCIÓN 2: Lista de Materiales (Oculta por defecto) -->
+            <div id="materials-section">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h4 class="mb-0 text-primary">Materiales de la Clase</h4>
+                    <button class="btn btn-sm btn-outline-danger" onclick="logout()">Salir</button>
+                </div>
+                <ul class="list-group text-start shadow-sm" id="materials-list">
+                    <!-- Los materiales se insertarán aquí dinámicamente -->
+                </ul>
+                <button class="btn btn-light border shadow-sm mt-4 w-100 fw-bold text-secondary" onclick="loadMaterials()">
+                    🔄 Refrescar Materiales
+                </button>
+
+                <!-- SECCIÓN 3: Enviar Trabajo -->
+                <hr class="my-4">
+                <div class="text-start bg-light p-3 rounded border">
+                    <h5 class="text-secondary mb-3">📤 Enviar Trabajo al Profesor</h5>
+                    <p class="small text-muted mb-2">Necesitas un <strong>Pase de Entrega</strong> para enviar un archivo. Pídeselo al profesor.</p>
+                    <div class="mb-2">
+                        <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: ENTREGA-XXXX)" style="text-transform: uppercase;">
+                    </div>
+                    <div class="mb-3">
+                        <input type="file" id="upload-file" class="form-control">
+                    </div>
+                    <button class="btn btn-warning w-100 fw-bold text-dark" id="btn-submit" onclick="submitWork()">Enviar Trabajo</button>
+                    <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica del Estudiante con Vanilla JavaScript -->
+    <script>
+        let currentToken = '';
+
+        // Función para validar el token contra el Backend
+        async function login() {
+            const token = document.getElementById('token-input').value.trim().toUpperCase();
+            if (!token) return;
+
+            try {
+                const res = await fetch('/api/student/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    currentToken = data.token; // Guardar token localmente
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('materials-section').style.display = 'block';
+                    loadMaterials();
+                } else {
+                    showError(data.error);
+                }
+            } catch (err) {
+                showError('Error de red. Asegúrate que el servidor esté corriendo.');
+            }
+        }
+
+        // Función para cargar los materiales del Backend
+        async function loadMaterials() {
+            try {
+                // Pasamos el token en los headers de autorización
+                const res = await fetch('/api/student/materials', {
+                    headers: { 'Authorization': currentToken }
+                });
+
+                if (res.status === 403) {
+                    alert('Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es válido.');
+                    logout();
+                    return;
+                }
+
+                const materials = await res.json();
+                const list = document.getElementById('materials-list');
+                list.innerHTML = '';
+
+                if (materials.length === 0) {
+                    list.innerHTML = '<li class="list-group-item text-muted text-center py-4">No hay materiales compartidos aún.</li>';
+                    return;
+                }
+
+                // Renderizar cada material dependiendo de su tipo
+                materials.forEach(m => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center py-3';
+
+                    if (m.type === 'link') {
+                        li.innerHTML = `
+                            <div class="text-truncate pe-3"><strong>🔗 ${m.title}</strong><br><small class="text-muted">${m.url}</small></div>
+                            <a href="${m.url}" target="_blank" class="btn btn-sm btn-outline-primary px-3">Abrir</a>
+                        `;
+                    } else if (m.type === 'file') {
+                        // Para descargar, pasamos el token por la query string del enlace
+                        li.innerHTML = `
+                            <div class="text-truncate pe-3"><strong>📄 ${m.title}</strong></div>
+                            <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-success px-3">Descargar</a>
+                        `;
+                    }
+                    list.appendChild(li);
+                });
+            } catch (err) {
+                console.error('Error cargando materiales:', err);
+            }
+        }
+
+        // Función para volver a la pantalla inicial
+        function logout() {
+            currentToken = '';
+            document.getElementById('token-input').value = '';
+            document.getElementById('materials-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+        }
+
+        // Utilidad para mostrar alertas visuales
+        function showError(msg) {
+            const el = document.getElementById('login-error');
+            el.innerText = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 4000);
+        }
+
+        // Función para enviar trabajos
+        async function submitWork() {
+            const token = document.getElementById('upload-token').value.trim().toUpperCase();
+            const fileInput = document.getElementById('upload-file');
+            const msgEl = document.getElementById('upload-message');
+            
+            if (!token) return alert('Debes ingresar el Pase de Entrega.');
+            if (!fileInput.files.length) return alert('Debes seleccionar un archivo.');
+
+            const formData = new FormData();
+            formData.append('uploadToken', token);
+            formData.append('file', fileInput.files[0]);
+
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerText = 'Enviando... ⏳';
+            
+            try {
+                const res = await fetch('/api/student/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                msgEl.style.display = 'block';
+                if (res.ok) {
+                    msgEl.className = 'mt-2 text-center text-success fw-bold';
+                    msgEl.innerText = '¡Trabajo enviado con éxito!';
+                    document.getElementById('upload-token').value = '';
+                    fileInput.value = '';
+                } else {
+                    msgEl.className = 'mt-2 text-center text-danger fw-bold';
+                    msgEl.innerText = data.error || 'Error al enviar.';
+                }
+            } catch (e) {
+                msgEl.style.display = 'block';
+                msgEl.className = 'mt-2 text-center text-danger fw-bold';
+                msgEl.innerText = 'Error de conexión.';
+            }
+            
+            btn.disabled = false;
+            btn.innerText = 'Enviar Trabajo';
+            setTimeout(() => msgEl.style.display = 'none', 5000);
+        }
+    </script>
+</body>
+</html>
