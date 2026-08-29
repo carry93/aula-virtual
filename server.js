@@ -202,8 +202,8 @@ app.post('/api/student/upload', upload.single('file'), (req, res) => {
     
     studentSubmissions.push(submission);
     
-    // Eliminar el token para que sea de UN SOLO USO
-    uploadTokens = uploadTokens.filter(t => t !== uploadToken);
+    // Ya no se elimina el token para que pueda usarse múltiples veces
+    // uploadTokens = uploadTokens.filter(t => t !== uploadToken);
 
     res.json({ message: 'Trabajo enviado con éxito', submission });
 });
