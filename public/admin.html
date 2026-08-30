@@ -39,6 +39,29 @@
             <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
         </div>
 
+        <!-- BANNER DE TOKEN GIGANTE -->
+        <div class="alert alert-primary text-center py-4 mb-4 shadow-sm" id="main-token-banner" style="display: none;">
+            <h5 class="text-uppercase mb-2 text-primary-emphasis">Clave de Acceso de Hoy</h5>
+            <h1 class="display-1 fw-bold text-white bg-primary rounded px-5 py-3 d-inline-block letter-spacing-2" id="main-token-display"></h1>
+            <p class="mt-3 mb-0 text-muted small">Pídele a tus alumnos que usen este código para entrar a la clase.</p>
+        </div>
+
+        <!-- MEDIDOR DE ALMACENAMIENTO -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0 text-secondary">💽 Uso de Almacenamiento del Servidor</h6>
+                    <span id="storage-text" class="fw-bold text-success">0 MB / 250 MB</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div id="storage-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                </div>
+                <small id="storage-warning" class="text-danger fw-bold mt-2" style="display: none;">
+                    ⚠️ ADVERTENCIA: El servidor está a punto de llenarse. Por favor descarga los trabajos y finaliza la clase pronto.
+                </small>
+            </div>
+        </div>
+
         <div class="row">
             <!-- PANEL IZQUIERDO: Controles (Tokens y Subidas) -->
             <div class="col-md-5">
@@ -178,6 +201,30 @@
                 renderMaterials(data.materials);
                 if(data.uploadTokens) renderUploadTokens(data.uploadTokens);
                 if(data.studentSubmissions) renderSubmissions(data.studentSubmissions);
+                
+                // Actualizar Medidor de Almacenamiento
+                if (data.totalBytes !== undefined) {
+                    const maxBytes = 250 * 1024 * 1024; // 250 MB
+                    const mbUsed = (data.totalBytes / (1024 * 1024)).toFixed(2);
+                    const percentage = Math.min((data.totalBytes / maxBytes) * 100, 100);
+                    
+                    document.getElementById('storage-text').innerText = `${mbUsed} MB / 250 MB`;
+                    document.getElementById('storage-bar').style.width = `${percentage}%`;
+                    
+                    if (percentage > 80) { // Si pasa el 80% (200MB) advertir en rojo
+                        document.getElementById('storage-bar').className = 'progress-bar bg-danger progress-bar-striped progress-bar-animated';
+                        document.getElementById('storage-text').className = 'fw-bold text-danger';
+                        document.getElementById('storage-warning').style.display = 'block';
+                    } else if (percentage > 50) {
+                        document.getElementById('storage-bar').className = 'progress-bar bg-warning';
+                        document.getElementById('storage-text').className = 'fw-bold text-warning';
+                        document.getElementById('storage-warning').style.display = 'none';
+                    } else {
+                        document.getElementById('storage-bar').className = 'progress-bar bg-success';
+                        document.getElementById('storage-text').className = 'fw-bold text-success';
+                        document.getElementById('storage-warning').style.display = 'none';
+                    }
+                }
             } catch (e) {
                 console.error('Error de conexión:', e);
             }
@@ -186,10 +233,19 @@
         // Pintar lista de tokens en el HTML
         function renderTokens(tokens) {
             const list = document.getElementById('tokens-list');
+            const banner = document.getElementById('main-token-banner');
+            const display = document.getElementById('main-token-display');
+            
             if (tokens.length === 0) {
                 list.innerHTML = '<li class="list-group-item text-muted text-center">Ningún token activo</li>';
+                banner.style.display = 'none';
                 return;
             }
+            
+            // Mostrar banner gigante con el último token generado
+            banner.style.display = 'block';
+            display.innerText = tokens[tokens.length - 1];
+
             list.innerHTML = '';
             tokens.forEach(t => {
                 list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-4 letter-spacing-1 bg-body-secondary">${t}</li>`;
