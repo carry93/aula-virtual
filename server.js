@@ -87,7 +87,8 @@ app.post('/api/admin/material/file', upload.single('file'), (req, res) => {
         type: 'file',
         title: req.file.originalname,
         path: req.file.path, // Ruta física en el disco (necesaria para la descarga)
-        filename: req.file.filename
+        filename: req.file.filename,
+        size: req.file.size
     };
     materials.push(material);
     res.json({ message: 'Archivo subido con éxito', material });
@@ -112,7 +113,11 @@ app.get('/api/admin/download-submission/:id', (req, res) => {
 
 // 4. Obtener el estado actual (para refrescar el panel del profesor)
 app.get('/api/admin/status', (req, res) => {
-    res.json({ activeTokens, materials, uploadTokens, studentSubmissions });
+    let totalBytes = 0;
+    materials.forEach(m => { if (m.size) totalBytes += m.size; });
+    studentSubmissions.forEach(s => { if (s.size) totalBytes += s.size; });
+    
+    res.json({ activeTokens, materials, uploadTokens, studentSubmissions, totalBytes });
 });
 
 // 5. CERRAR CLASE (CRÍTICO): Borra memoria y destruye archivos físicos
@@ -197,7 +202,8 @@ app.post('/api/student/upload', upload.single('file'), (req, res) => {
         title: req.file.originalname,
         path: req.file.path,
         filename: req.file.filename,
-        tokenUsed: uploadToken
+        tokenUsed: uploadToken,
+        size: req.file.size
     };
     
     studentSubmissions.push(submission);
