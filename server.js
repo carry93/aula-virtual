@@ -186,20 +186,28 @@ app.get('/api/download/:id', requireToken, (req, res) => {
 
 // 4. Subir un trabajo de estudiante (Protegido por token de entrega)
 app.post('/api/student/upload', upload.single('file'), (req, res) => {
-    const { uploadToken } = req.body;
+    const { uploadToken, studentName, studentGrade } = req.body;
     
     // Verificar que el token exista y sea válido
     if (!uploadToken || !uploadTokens.includes(uploadToken)) {
         // Borrar el archivo si el token es inválido
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        return res.status(403).json({ error: 'Token de entrega inválido o ya fue usado.' });
+        return res.status(403).json({ error: 'Token de entrega inválido o clase inactiva.' });
     }
     
     if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
 
+    // Limpiar y formatear el nombre y grado para evitar caracteres extraños en el archivo
+    const safeName = (studentName || 'SinNombre').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const safeGrade = (studentGrade || 'SinGrado').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const extension = path.extname(req.file.originalname) || '';
+    
+    // El título con el que verá y descargará el profesor el archivo
+    const finalTitle = `${safeGrade}_${safeName}${extension}`;
+
     const submission = {
         id: Date.now().toString(),
-        title: req.file.originalname,
+        title: finalTitle,
         path: req.file.path,
         filename: req.file.filename,
         tokenUsed: uploadToken,
