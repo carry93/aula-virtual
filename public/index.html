@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aula Virtual gratuita para estudiantes y docentes. Plataforma educativa para recepción de tareas, descarga de materiales y gestión de clases en tiempo real.">
+    <meta name="keywords" content="aula virtual, educación, educación a distancia, tareas, profesores, estudiantes, escuela en línea">
     <title>Aula Virtual - Estudiante</title>
     <!-- Favicon @ -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>@</text></svg>">
@@ -95,11 +97,13 @@
                 <hr class="my-4">
                 <div class="text-start bg-body-tertiary p-3 rounded border">
                     <h5 class="text-secondary mb-3">📤 Enviar Trabajo al Profesor</h5>
-                    <div class="alert alert-warning py-2 small fw-bold">
-                        ⚠️ Importante: El archivo que envíes debe llevar tu Nombre y Grado (Ej: JuanPerez-5to.pdf).
+                    <div class="alert alert-info py-2 small fw-bold">
+                        ℹ️ Por favor, llena tus datos para que el profesor sepa de quién es el trabajo.
                     </div>
                     <p class="small text-muted mb-2">Pídele el <strong>Pase de Entrega</strong> al profesor para poder enviar.</p>
                     <div class="mb-2">
+                        <input type="text" id="student-name" class="form-control mb-2" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
+                        <input type="text" id="student-grade" class="form-control mb-2" placeholder="Tu Grado (Ej. 5to Secundaria)">
                         <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: ENTREGA-XXXX)" style="text-transform: uppercase;">
                     </div>
                     <div class="mb-3">
@@ -112,10 +116,65 @@
         </div>
     </div>
     
-    <footer class="mt-5 mb-3 text-center text-muted small">
+    <!-- Texto SEO para AdSense (Texto descriptivo oculto estéticamente o sutil) -->
+    <div class="container mt-5 mb-2 text-center" style="max-width: 700px; opacity: 0.6;">
+        <h5 class="text-muted fs-6 text-uppercase">Sobre Nuestra Plataforma Educativa</h5>
+        <p class="small text-muted mb-0">
+            Bienvenido a la mejor plataforma de Aula Virtual. Una herramienta educativa diseñada para facilitar la conexión entre profesores y estudiantes. Nuestro sistema permite el intercambio seguro y rápido de documentos, recepción de tareas escolares y visualización de recursos didácticos en tiempo real. Fomentamos el aprendizaje digital y la educación a distancia sin necesidad de registros complicados, manteniendo la privacidad de la información académica.
+        </p>
+    </div>
+
+    <footer class="mt-4 mb-3 text-center text-muted small">
+        <div class="mb-2 d-flex justify-content-center gap-3">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted hover-primary">Política de Privacidad</a>
+            <span class="text-muted">|</span>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted hover-primary">Términos de Servicio</a>
+            <span class="text-muted">|</span>
+            <a href="mailto:contacto@bullstudio.online" class="text-decoration-none text-muted hover-primary">Contacto</a>
+        </div>
         &copy; 2026 Aula Virtual. Todos los derechos reservados.<br>
         Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
     </footer>
+
+    <!-- MODALES LEGALES (Requisito de Google AdSense) -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content bg-body-tertiary">
+                <div class="modal-header">
+                    <h5 class="modal-title text-secondary">Política de Privacidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body small text-muted">
+                    <h6>1. Recopilación de Información</h6>
+                    <p>No recopilamos información personal sensible. El sistema es efímero; los nombres y grados introducidos al enviar tareas se utilizan únicamente para identificar el trabajo durante la sesión activa y se destruyen permanentemente al finalizar la clase.</p>
+                    <h6>2. Uso de Cookies y Publicidad (Google AdSense)</h6>
+                    <p>Utilizamos Google AdSense para mostrar anuncios. Google y sus socios utilizan cookies para publicar anuncios basados en sus visitas anteriores a este u otros sitios web de Internet. Los usuarios pueden inhabilitar la publicidad personalizada visitando la Configuración de anuncios de Google.</p>
+                    <h6>3. Almacenamiento de Archivos</h6>
+                    <p>Los archivos educativos subidos a nuestros servidores se almacenan temporalmente y son eliminados físicamente del servidor tan pronto como el docente finaliza la sesión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content bg-body-tertiary">
+                <div class="modal-header">
+                    <h5 class="modal-title text-secondary">Términos de Servicio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body small text-muted">
+                    <h6>1. Condiciones de Uso</h6>
+                    <p>Al utilizar nuestra Aula Virtual, aceptas usar la plataforma exclusivamente con fines educativos y de aprendizaje. Está estrictamente prohibido subir contenido protegido por derechos de autor, material inapropiado o software malicioso.</p>
+                    <h6>2. Disponibilidad del Servicio</h6>
+                    <p>El servicio se ofrece "tal cual", sujeto a la disponibilidad de nuestros servidores. No nos hacemos responsables por la pérdida de trabajos no descargados por el docente antes de finalizar la sesión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle con Popper (Necesario para Modales) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Lógica del Estudiante con Vanilla JavaScript -->
     <script>
@@ -213,14 +272,20 @@
         // Función para enviar trabajos
         async function submitWork() {
             const token = document.getElementById('upload-token').value.trim().toUpperCase();
+            const name = document.getElementById('student-name').value.trim();
+            const grade = document.getElementById('student-grade').value.trim();
             const fileInput = document.getElementById('upload-file');
             const msgEl = document.getElementById('upload-message');
             
+            if (!name) return alert('Debes ingresar tu Nombre Completo.');
+            if (!grade) return alert('Debes ingresar tu Grado.');
             if (!token) return alert('Debes ingresar el Pase de Entrega.');
             if (!fileInput.files.length) return alert('Debes seleccionar un archivo.');
 
             const formData = new FormData();
             formData.append('uploadToken', token);
+            formData.append('studentName', name);
+            formData.append('studentGrade', grade);
             formData.append('file', fileInput.files[0]);
 
             const btn = document.getElementById('btn-submit');
