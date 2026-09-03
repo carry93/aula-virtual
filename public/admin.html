@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -262,8 +262,8 @@
                 list.innerHTML += `
                     <li class="list-group-item py-3">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-1">📄 ${s.title}</h6>
-                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success">Descargar</a>
+                            <h6 class="mb-1 text-truncate pe-3" title="${s.title}">📄 ${s.title}</h6>
+                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap">Descargar</a>
                         </div>
                         <small class="text-muted">Pase usado: ${s.tokenUsed}</small>
                     </li>
@@ -302,7 +302,7 @@
                 list.innerHTML += `
                     <li class="list-group-item py-3">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-1">${icon} ${m.title}</h6>
+                            <h6 class="mb-1 text-truncate pe-3" title="${m.title}">${icon} ${m.title}</h6>
                             <span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase">${m.type}</span>
                         </div>
                         <small class="text-muted">${extraInfo}</small>

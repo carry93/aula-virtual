@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -61,7 +61,7 @@
     <div class="container">
         <div class="card shadow-sm text-center p-4">
             <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
-            <h1 class="mb-4 fw-bold text-primary display-5">compuclase.click</h1>
+            <h1 class="mb-4 fw-bold text-white display-5">compuclase.click</h1>
 
             <!-- SECCIÃ“N 1: Ingreso de Token -->
             <div id="login-section">
@@ -228,7 +228,7 @@
                     err.style.display = "block";
                 }
             } catch (e) {
-                alert("Error de conexión.");
+                alert("Error de conexiï¿½n.");
             }
         }
 
@@ -248,7 +248,7 @@
                 });
 
                 if (res.status === 403) {
-                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es válido.");
+                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es vï¿½lido.");
                     logout();
                     return;
                 }
@@ -262,15 +262,15 @@
                 const list = document.getElementById("materials-list");
                 list.innerHTML = "";
                 if (data.materials.length === 0) {
-                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor aún no ha compartido materiales.</li>";
+                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor aï¿½n no ha compartido materiales.</li>";
                 } else {
                     data.materials.forEach(m => {
                         if (m.type === "link") {
                             list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold">?? ${m.title}</a></li>`;
                         } else {
                             list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
-                                <span>?? ${m.title}</span>
-                                <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary">Descargar</a>
+                                <span class="text-truncate pe-3" title="${m.title}">ðŸ“„ ${m.title}</span>
+                                <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary text-nowrap">Descargar</a>
                             </li>`;
                         }
                     });
@@ -278,7 +278,7 @@
                 
                 const subList = document.getElementById("student-submissions-list");
                 if (!data.submissions || data.submissions.length === 0) {
-                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Aún no hay entregas.</li>";
+                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Aï¿½n no hay entregas.</li>";
                 } else {
                     subList.innerHTML = "";
                     data.submissions.forEach(s => {
@@ -324,7 +324,7 @@
                 
                 if (res.ok) {
                     msgEl.className = "mt-2 text-center text-success fw-bold";
-                    msgEl.innerText = "¡Trabajo enviado exitosamente!";
+                    msgEl.innerText = "ï¿½Trabajo enviado exitosamente!";
                     fileInput.value = ""; 
                     document.getElementById("upload-token").value = ""; 
                     loadMaterials(); 
@@ -335,7 +335,7 @@
             } catch (e) {
                 msgEl.style.display = "block";
                 msgEl.className = "mt-2 text-center text-danger fw-bold";
-                msgEl.innerText = "Error de conexión.";
+                msgEl.innerText = "Error de conexiï¿½n.";
             }
             
             btn.disabled = false;
