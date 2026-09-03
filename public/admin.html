@@ -39,12 +39,7 @@
             <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
         </div>
 
-        <!-- BANNER DE TOKEN GIGANTE -->
-        <div class="alert alert-primary text-center py-4 mb-4 shadow-sm" id="main-token-banner" style="display: none;">
-            <h5 class="text-uppercase mb-2 text-primary-emphasis">Clave de Acceso de Hoy</h5>
-            <h1 class="display-1 fw-bold text-white bg-primary rounded px-5 py-3 d-inline-block letter-spacing-2" id="main-token-display"></h1>
-            <p class="mt-3 mb-0 text-muted small">Pídele a tus alumnos que usen este código para entrar a la clase.</p>
-        </div>
+
 
         <!-- MEDIDOR DE ALMACENAMIENTO -->
         <div class="card shadow-sm mb-4 border-0">
@@ -233,19 +228,10 @@
         // Pintar lista de tokens en el HTML
         function renderTokens(tokens) {
             const list = document.getElementById('tokens-list');
-            const banner = document.getElementById('main-token-banner');
-            const display = document.getElementById('main-token-display');
-            
             if (tokens.length === 0) {
                 list.innerHTML = '<li class="list-group-item text-muted text-center">Ningún token activo</li>';
-                banner.style.display = 'none';
                 return;
             }
-            
-            // Mostrar banner gigante con el último token generado
-            banner.style.display = 'block';
-            display.innerText = tokens[tokens.length - 1];
-
             list.innerHTML = '';
             tokens.forEach(t => {
                 list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-4 letter-spacing-1 bg-body-secondary">${t}</li>`;
@@ -395,3 +381,4 @@
     </script>
 </body>
 </html>
+

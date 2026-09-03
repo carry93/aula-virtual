@@ -80,22 +80,45 @@
                 <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
             </div>
 
-            <!-- SECCIÓN 2: Lista de Materiales (Oculta por defecto) -->
+            <!-- SECCIÓN 2: Lista de Materiales y Tokens -->
             <div id="materials-section">
-                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                
+                <!-- BANNERS DE TOKENS (Visible en proyector) -->
+                <div class="row text-center mb-4 g-2">
+                    <div class="col-6">
+                        <div class="p-2 bg-primary rounded text-white shadow-sm border border-primary">
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Clave de Sesión</small>
+                            <span class="fs-4 fw-bold" id="display-access-token">---</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Pase de Entrega</small>
+                            <span class="fs-4 fw-bold" id="display-upload-token">---</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 border-secondary">
                     <h4 class="mb-0 text-primary">Materiales de la Clase</h4>
                     <button class="btn btn-sm btn-outline-danger" onclick="logout()">Salir</button>
                 </div>
-                <ul class="list-group text-start shadow-sm" id="materials-list">
+                
+                <ul class="list-group text-start shadow-sm mb-4" id="materials-list">
                     <!-- Los materiales se insertarán aquí dinámicamente -->
                 </ul>
-                <button class="btn btn-light border shadow-sm mt-4 w-100 fw-bold text-secondary" onclick="loadMaterials()">
-                    🔄 Refrescar Materiales
-                </button>
+
+                <!-- SECCIÓN: Trabajos Recibidos -->
+                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary mb-4">
+                    <h5 class="text-secondary mb-3">✅ Trabajos Entregados</h5>
+                    <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent">
+                        <li class="list-group-item text-muted text-center bg-transparent border-0">Aún no hay entregas.</li>
+                    </ul>
+                </div>
 
                 <!-- SECCIÓN 3: Enviar Trabajo -->
-                <hr class="my-4">
-                <div class="text-start bg-body-tertiary p-3 rounded border">
+                <hr class="my-4 border-secondary">
+                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary">
                     <h5 class="text-secondary mb-3">📤 Enviar Trabajo al Profesor</h5>
                     <div class="alert alert-info py-2 small fw-bold">
                         ℹ️ Por favor, llena tus datos para que el profesor sepa de quién es el trabajo.
@@ -178,165 +201,163 @@
 
     <!-- Lógica del Estudiante con Vanilla JavaScript -->
     <script>
-        let currentToken = '';
+        let currentToken = "";
+        let refreshInterval = null;
 
-        // Función para validar el token contra el Backend
         async function login() {
-            const token = document.getElementById('token-input').value.trim().toUpperCase();
-            if (!token) return;
+            const token = document.getElementById("token-input").value.trim().toUpperCase();
+            if (!token) return alert("Por favor ingresa un token.");
 
             try {
-                const res = await fetch('/api/student/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const res = await fetch("/api/student/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ token })
                 });
 
-                const data = await res.json();
                 if (res.ok) {
-                    currentToken = data.token; // Guardar token localmente
-                    document.getElementById('login-section').style.display = 'none';
-                    document.getElementById('materials-section').style.display = 'block';
+                    currentToken = token;
+                    document.getElementById("login-section").style.display = "none";
+                    document.getElementById("materials-section").style.display = "block";
                     loadMaterials();
+                    refreshInterval = setInterval(loadMaterials, 10000);
                 } else {
-                    showError(data.error);
+                    const data = await res.json();
+                    const err = document.getElementById("login-error");
+                    err.innerText = data.error;
+                    err.style.display = "block";
                 }
-            } catch (err) {
-                showError('Error de red. Asegúrate que el servidor esté corriendo.');
+            } catch (e) {
+                alert("Error de conexi�n.");
             }
         }
 
-        // Función para cargar los materiales del Backend
+        function logout() {
+            currentToken = "";
+            if(refreshInterval) clearInterval(refreshInterval);
+            document.getElementById("token-input").value = "";
+            document.getElementById("login-section").style.display = "block";
+            document.getElementById("materials-section").style.display = "none";
+        }
+
         async function loadMaterials() {
+            if (!currentToken) return;
             try {
-                // Pasamos el token en los headers de autorización
-                const res = await fetch('/api/student/materials', {
-                    headers: { 'Authorization': currentToken }
+                const res = await fetch("/api/student/materials", {
+                    headers: { "Authorization": currentToken }
                 });
 
                 if (res.status === 403) {
-                    alert('Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es válido.');
+                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es v�lido.");
                     logout();
                     return;
                 }
 
-                const materials = await res.json();
-                const list = document.getElementById('materials-list');
-                list.innerHTML = '';
+                const data = await res.json();
+                
+                document.getElementById("display-access-token").innerText = currentToken;
+                document.getElementById("display-upload-token").innerText = 
+                    (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
-                if (materials.length === 0) {
-                    list.innerHTML = '<li class="list-group-item text-muted text-center py-4">No hay materiales compartidos aún.</li>';
-                    return;
+                const list = document.getElementById("materials-list");
+                list.innerHTML = "";
+                if (data.materials.length === 0) {
+                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor a�n no ha compartido materiales.</li>";
+                } else {
+                    data.materials.forEach(m => {
+                        if (m.type === "link") {
+                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold">?? ${m.title}</a></li>`;
+                        } else {
+                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                                <span>?? ${m.title}</span>
+                                <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary">Descargar</a>
+                            </li>`;
+                        }
+                    });
+                }
+                
+                const subList = document.getElementById("student-submissions-list");
+                if (!data.submissions || data.submissions.length === 0) {
+                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">A�n no hay entregas.</li>";
+                } else {
+                    subList.innerHTML = "";
+                    data.submissions.forEach(s => {
+                        subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">?? ${s.title}</li>`;
+                    });
                 }
 
-                // Renderizar cada material dependiendo de su tipo
-                materials.forEach(m => {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center py-3';
-
-                    if (m.type === 'link') {
-                        li.innerHTML = `
-                            <div class="text-truncate pe-3"><strong>🔗 ${m.title}</strong><br><small class="text-muted">${m.url}</small></div>
-                            <a href="${m.url}" target="_blank" class="btn btn-sm btn-outline-primary px-3">Abrir</a>
-                        `;
-                    } else if (m.type === 'file') {
-                        // Para descargar, pasamos el token por la query string del enlace
-                        li.innerHTML = `
-                            <div class="text-truncate pe-3"><strong>📄 ${m.title}</strong></div>
-                            <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-success px-3">Descargar</a>
-                        `;
-                    }
-                    list.appendChild(li);
-                });
-            } catch (err) {
-                console.error('Error cargando materiales:', err);
+            } catch (e) {
+                console.error("Error al cargar datos:", e);
             }
         }
 
-        // Función para volver a la pantalla inicial
-        function logout() {
-            currentToken = '';
-            document.getElementById('token-input').value = '';
-            document.getElementById('materials-section').style.display = 'none';
-            document.getElementById('login-section').style.display = 'block';
-        }
-
-        // Utilidad para mostrar alertas visuales
-        function showError(msg) {
-            const el = document.getElementById('login-error');
-            el.innerText = msg;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 4000);
-        }
-
-        // Función para enviar trabajos
         async function submitWork() {
-            const token = document.getElementById('upload-token').value.trim().toUpperCase();
-            const name = document.getElementById('student-name').value.trim();
-            const grade = document.getElementById('student-grade').value.trim();
-            const fileInput = document.getElementById('upload-file');
-            const msgEl = document.getElementById('upload-message');
+            const token = document.getElementById("upload-token").value.trim().toUpperCase();
+            const name = document.getElementById("student-name").value.trim();
+            const grade = document.getElementById("student-grade").value.trim();
+            const fileInput = document.getElementById("upload-file");
+            const msgEl = document.getElementById("upload-message");
             
-            if (!name) return alert('Debes ingresar tu Nombre Completo.');
-            if (!grade) return alert('Debes ingresar tu Grado.');
-            if (!token) return alert('Debes ingresar el Pase de Entrega.');
-            if (!fileInput.files.length) return alert('Debes seleccionar un archivo.');
+            if (!name) return alert("Debes ingresar tu Nombre Completo.");
+            if (!grade) return alert("Debes ingresar tu Grado.");
+            if (!token) return alert("Debes ingresar el Pase de Entrega.");
+            if (!fileInput.files.length) return alert("Debes seleccionar un archivo.");
 
             const formData = new FormData();
-            formData.append('uploadToken', token);
-            formData.append('studentName', name);
-            formData.append('studentGrade', grade);
-            formData.append('file', fileInput.files[0]);
+            formData.append("uploadToken", token);
+            formData.append("studentName", name);
+            formData.append("studentGrade", grade);
+            formData.append("file", fileInput.files[0]);
 
-            const btn = document.getElementById('btn-submit');
+            const btn = document.getElementById("btn-submit");
             btn.disabled = true;
-            btn.innerText = 'Enviando... ⏳';
+            btn.innerText = "Enviando... ?";
             
             try {
-                const res = await fetch('/api/student/upload', {
-                    method: 'POST',
+                const res = await fetch("/api/student/upload", {
+                    method: "POST",
                     body: formData
                 });
+
                 const data = await res.json();
+                msgEl.style.display = "block";
                 
-                msgEl.style.display = 'block';
                 if (res.ok) {
-                    msgEl.className = 'mt-2 text-center text-success fw-bold';
-                    msgEl.innerText = '¡Trabajo enviado con éxito!';
-                    document.getElementById('upload-token').value = '';
-                    fileInput.value = '';
+                    msgEl.className = "mt-2 text-center text-success fw-bold";
+                    msgEl.innerText = "�Trabajo enviado exitosamente!";
+                    fileInput.value = ""; 
+                    document.getElementById("upload-token").value = ""; 
+                    loadMaterials(); 
                 } else {
-                    msgEl.className = 'mt-2 text-center text-danger fw-bold';
-                    msgEl.innerText = data.error || 'Error al enviar.';
+                    msgEl.className = "mt-2 text-center text-danger fw-bold";
+                    msgEl.innerText = data.error || "Error al enviar.";
                 }
             } catch (e) {
-                msgEl.style.display = 'block';
-                msgEl.className = 'mt-2 text-center text-danger fw-bold';
-                msgEl.innerText = 'Error de conexión.';
+                msgEl.style.display = "block";
+                msgEl.className = "mt-2 text-center text-danger fw-bold";
+                msgEl.innerText = "Error de conexi�n.";
             }
             
             btn.disabled = false;
-            btn.innerText = 'Enviar Trabajo';
-            setTimeout(() => msgEl.style.display = 'none', 5000);
+            btn.innerText = "Enviar Trabajo";
+            setTimeout(() => msgEl.style.display = "none", 5000);
         }
-
-        // Lógica de la estela interactiva del mouse
-        document.addEventListener('mousemove', function(e) {
-            const trail = document.createElement('div');
-            trail.className = 'mouse-trail';
-            trail.style.left = e.clientX + 'px';
-            trail.style.top = e.clientY + 'px';
+        
+        document.addEventListener("mousemove", function(e) {
+            const trail = document.createElement("div");
+            trail.className = "mouse-trail";
+            trail.style.left = e.clientX + "px";
+            trail.style.top = e.clientY + "px";
             document.body.appendChild(trail);
 
-            // Forzar reflow y animar
             requestAnimationFrame(() => {
-                trail.style.transform = 'translate(-50%, -50%) scale(0.1)';
-                trail.style.opacity = '0';
+                trail.style.transform = "translate(-50%, -50%) scale(0.1)";
+                trail.style.opacity = "0";
             });
 
-            // Limpiar del DOM después de la animación
             setTimeout(() => trail.remove(), 400);
         });
     </script>
 </body>
 </html>
+
