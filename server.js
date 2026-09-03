@@ -96,7 +96,8 @@ app.post('/api/admin/material/file', upload.single('file'), (req, res) => {
 
 // Generar token para permitir que un estudiante envíe un archivo
 app.post('/api/admin/upload-token', (req, res) => {
-    const newToken = 'ENTREGA-' + crypto.randomBytes(2).toString('hex').toUpperCase();
+    // Genera un token aleatorio de 6 caracteres hexadecimales al igual que la clave de acceso
+    const newToken = crypto.randomBytes(3).toString('hex').toUpperCase();
     uploadTokens.push(newToken);
     res.json({ token: newToken, uploadTokens });
 });
@@ -169,7 +170,16 @@ app.get('/api/student/materials', requireToken, (req, res) => {
         }
         return m; // Enlaces se envían completos
     });
-    res.json(safeMaterials);
+    
+    // Mapeamos los trabajos para enviar solo el título y no las rutas de los otros alumnos
+    const safeSubmissions = studentSubmissions.map(s => ({ title: s.title }));
+
+    res.json({
+        materials: safeMaterials,
+        activeTokens: activeTokens,
+        uploadTokens: uploadTokens,
+        submissions: safeSubmissions
+    });
 });
 
 // 3. Descargar archivo (Protegido por requireToken pasado por Query String)
