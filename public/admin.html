@@ -1,4 +1,4 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -22,8 +22,8 @@
             <input type="text" id="admin-user" class="form-control mb-2" placeholder="Usuario">
             
             <div class="input-group mb-3">
-                <input type="password" id="admin-pass" class="form-control" placeholder="Contrase√±a">
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" id="btn-eye">üëÅÔ∏è</button>
+                <input type="password" id="admin-pass" class="form-control" placeholder="ContraseÒa">
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" id="btn-eye">???</button>
             </div>
 
             <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()">Entrar al Panel</button>
@@ -33,10 +33,10 @@
 
     <!-- CONTENIDO DEL PANEL (Oculto hasta hacer login) -->
     <div class="container" id="admin-content" style="display: none;">
-        <!-- Cabecera y Bot√≥n de Cierre (Crucial) -->
+        <!-- Cabecera y BotÛn de Cierre (Crucial) -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-body-tertiary p-3 rounded shadow-sm border-start border-primary border-5">
             <h2 class="m-0 text-primary">Panel del Profesor</h2>
-            <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">üõë Finalizar Clase y Destruir Datos</button>
+            <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">?? Finalizar Clase y Destruir Datos</button>
         </div>
 
 
@@ -45,14 +45,14 @@
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                    <h6 class="mb-0 text-secondary">üíΩ Uso de Almacenamiento del Servidor</h6>
+                    <h6 class="mb-0 text-secondary">?? Uso de Almacenamiento del Servidor</h6>
                     <span id="storage-text" class="fw-bold text-success">0 MB / 250 MB</span>
                 </div>
                 <div class="progress" style="height: 10px;">
                     <div id="storage-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
                 </div>
                 <small id="storage-warning" class="text-danger fw-bold mt-2" style="display: none;">
-                    ‚ö†Ô∏è ADVERTENCIA: El servidor est√° a punto de llenarse. Por favor descarga los trabajos y finaliza la clase pronto.
+                    ?? ADVERTENCIA: El servidor est· a punto de llenarse. Por favor descarga los trabajos y finaliza la clase pronto.
                 </small>
             </div>
         </div>
@@ -61,13 +61,13 @@
             <!-- PANEL IZQUIERDO: Controles (Tokens y Subidas) -->
             <div class="col-md-5">
                 
-                <!-- Tarjeta: Gesti√≥n de Tokens -->
+                <!-- Tarjeta: GestiÛn de Tokens -->
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-body">
                         <h5 class="text-secondary">Claves de Acceso</h5>
                         <button class="btn btn-primary w-100 mb-3 fw-bold" onclick="generateToken()">+ Generar Nuevo Token</button>
                         <ul id="tokens-list" class="list-group list-group-flush mb-0 border rounded">
-                            <li class="list-group-item text-muted text-center">Ning√∫n token activo</li>
+                            <li class="list-group-item text-muted text-center">Ning˙n token activo</li>
                         </ul>
                     </div>
                 </div>
@@ -80,17 +80,17 @@
                         <!-- Bootstrap Tabs para separar Enlace / Archivo -->
                         <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                           <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-pane" type="button" role="tab">üîó Enlace</button>
+                            <button class="nav-link active fw-bold" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-pane" type="button" role="tab">?? Enlace</button>
                           </li>
                           <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-pane" type="button" role="tab">üìÑ Archivo F√≠sico</button>
+                            <button class="nav-link fw-bold" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-pane" type="button" role="tab">?? Archivo FÌsico</button>
                           </li>
                         </ul>
 
                         <div class="tab-content" id="myTabContent">
                           <!-- Formulario para Enlaces -->
                           <div class="tab-pane fade show active" id="link-pane" role="tabpanel">
-                              <input type="text" id="link-title" class="form-control mb-2" placeholder="T√≠tulo (Ej: Wikipedia, YouTube...)">
+                              <input type="text" id="link-title" class="form-control mb-2" placeholder="TÌtulo (Ej: Wikipedia, YouTube...)">
                               <input type="url" id="link-url" class="form-control mb-3" placeholder="https://...">
                               <button class="btn btn-success w-100" onclick="addLink()">Compartir Enlace</button>
                           </div>
@@ -103,14 +103,14 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta: Gesti√≥n de Pases de Entrega -->
+                <!-- Tarjeta: GestiÛn de Pases de Entrega -->
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-body">
                         <h5 class="text-secondary">Pases de Entrega (Alumnos)</h5>
-                        <p class="small text-muted mb-2">Genera un c√≥digo de un solo uso para autorizar a un estudiante a subirte un archivo.</p>
+                        <p class="small text-muted mb-2">Genera un cÛdigo de un solo uso para autorizar a un estudiante a subirte un archivo.</p>
                         <button class="btn btn-warning w-100 mb-3 fw-bold text-dark" onclick="generateUploadToken()">+ Generar Pase de Entrega</button>
                         <ul id="upload-tokens-list" class="list-group list-group-flush mb-0 border rounded">
-                            <li class="list-group-item text-muted text-center">Ning√∫n pase activo</li>
+                            <li class="list-group-item text-muted text-center">Ning˙n pase activo</li>
                         </ul>
                     </div>
                 </div>
@@ -122,21 +122,22 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0 text-secondary">Materiales Compartidos en la Pizarra</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">üîÑ Refrescar</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">?? Refrescar</button>
                         </div>
                         <ul class="list-group" id="materials-list">
-                            <li class="list-group-item text-muted text-center py-4 bg-body-secondary border-dashed">La pizarra est√° vac√≠a.</li>
+                            <li class="list-group-item text-muted text-center py-4 bg-body-secondary border-dashed">La pizarra est· vacÌa.</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
                             <h5 class="mb-0 text-secondary">Trabajos Recibidos de Alumnos</h5>
-                            <div>
-                                <button class="btn btn-sm btn-outline-success me-2" onclick="downloadAllSubmissions()">‚¨áÔ∏è Descargar Todos</button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">üîÑ Refrescar</button>
+                            <div class="mt-2 mt-md-0 d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelectedSubmissions()">?? Eliminar Seleccionados</button>
+                                <button class="btn btn-sm btn-outline-success" onclick="downloadAllSubmissions()">?? Descargar Todos (ZIP)</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">?? Refrescar</button>
                             </div>
                         </div>
                         <ul class="list-group" id="submissions-list">
@@ -156,19 +157,19 @@
     <!-- Bootstrap JS (necesario para las tabs) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- L√≥gica del Profesor con Vanilla JavaScript -->
+    <!-- LÛgica del Profesor con Vanilla JavaScript -->
     <script>
-        // No cargamos los datos hasta que se inicie sesi√≥n
+        // No cargamos los datos hasta que se inicie sesiÛn
 
         function togglePassword() {
             const passInput = document.getElementById('admin-pass');
             const btnEye = document.getElementById('btn-eye');
             if (passInput.type === 'password') {
                 passInput.type = 'text';
-                btnEye.innerText = 'üôà';
+                btnEye.innerText = '??';
             } else {
                 passInput.type = 'password';
-                btnEye.innerText = 'üëÅÔ∏è';
+                btnEye.innerText = '???';
             }
         }
 
@@ -176,11 +177,11 @@
             const user = document.getElementById('admin-user').value.trim().toLowerCase();
             const pass = document.getElementById('admin-pass').value.trim().toLowerCase();
 
-            // Aceptamos la contrase√±a con o sin el punto final, y sin importar may√∫sculas
+            // Aceptamos la contraseÒa con o sin el punto final, y sin importar may˙sculas
             if (user === 'profesorcito' && (pass === 'edu.25694050' || pass === 'edu.25694050.')) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
-                loadStatus(); // Cargar los datos del backend ahora s√≠
+                loadStatus(); // Cargar los datos del backend ahora sÌ
             } else {
                 const err = document.getElementById('admin-error');
                 err.style.display = 'block';
@@ -221,7 +222,7 @@
                     }
                 }
             } catch (e) {
-                console.error('Error de conexi√≥n:', e);
+                console.error('Error de conexiÛn:', e);
             }
         }
 
@@ -229,7 +230,7 @@
         function renderTokens(tokens) {
             const list = document.getElementById('tokens-list');
             if (tokens.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center">Ning√∫n token activo</li>';
+                list.innerHTML = '<li class="list-group-item text-muted text-center">Ning˙n token activo</li>';
                 return;
             }
             list.innerHTML = '';
@@ -241,7 +242,7 @@
         function renderUploadTokens(tokens) {
             const list = document.getElementById('upload-tokens-list');
             if (tokens.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center">Ning√∫n pase activo</li>';
+                list.innerHTML = '<li class="list-group-item text-muted text-center">Ning˙n pase activo</li>';
                 return;
             }
             list.innerHTML = '';
@@ -251,21 +252,24 @@
         }
 
         function renderSubmissions(submissions) {
-            window.currentSubmissions = submissions; // Guardamos para la descarga m√∫ltiple
-            const list = document.getElementById('submissions-list');
+            window.currentSubmissions = submissions;
+            const list = document.getElementById("submissions-list");
             if (submissions.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center py-4 bg-body-secondary border-dashed">No hay trabajos recibidos.</li>';
+                list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
                 return;
             }
-            list.innerHTML = '';
+            list.innerHTML = "";
             submissions.forEach(s => {
                 list.innerHTML += `
                     <li class="list-group-item py-3">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-1 text-truncate pe-3" title="${s.title}">üìÑ ${s.title}</h6>
+                            <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                                <input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}">
+                                <h6 class="mb-0 text-truncate pe-3" title="${s.title}">?? ${s.title}</h6>
+                            </div>
                             <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap">Descargar</a>
                         </div>
-                        <small class="text-muted">Pase usado: ${s.tokenUsed}</small>
+                        <small class="text-muted ms-4 ps-2">Pase usado: ${s.tokenUsed}</small>
                     </li>
                 `;
             });
@@ -273,112 +277,52 @@
 
         function downloadAllSubmissions() {
             if (!window.currentSubmissions || window.currentSubmissions.length === 0) {
-                return alert('No hay trabajos para descargar.');
+                return alert("No hay trabajos para descargar.");
             }
-            // Descargar secuencialmente
-            window.currentSubmissions.forEach((s, index) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = `/api/admin/download-submission/${s.id}`;
-                    a.download = s.title;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }, index * 800); // 800ms de retraso entre descargas para que el navegador no las bloquee
-            });
-        }
-
-        // Pintar lista de materiales
-        function renderMaterials(materials) {
-            const list = document.getElementById('materials-list');
-            if (materials.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center py-4">No hay materiales compartidos.</li>';
-                return;
-            }
-            list.innerHTML = '';
-            materials.forEach(m => {
-                const icon = m.type === 'link' ? 'üîó' : 'üìÑ';
-                const extraInfo = m.type === 'link' ? `<a href="${m.url}" target="_blank">${m.url}</a>` : 'Guardado en servidor temporalmente';
-                list.innerHTML += `
-                    <li class="list-group-item py-3">
-                        <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-1 text-truncate pe-3" title="${m.title}">${icon} ${m.title}</h6>
-                            <span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase">${m.type}</span>
-                        </div>
-                        <small class="text-muted">${extraInfo}</small>
-                    </li>
-                `;
-            });
-        }
-
-        // Solicitar nuevo token
-        async function generateToken() {
-            const res = await fetch('/api/admin/token', { method: 'POST' });
-            const data = await res.json();
-            renderTokens(data.activeTokens);
-        }
-
-        async function generateUploadToken() {
-            const res = await fetch('/api/admin/upload-token', { method: 'POST' });
-            const data = await res.json();
-            renderUploadTokens(data.uploadTokens);
-        }
-
-        // Enviar nuevo enlace
-        async function addLink() {
-            const title = document.getElementById('link-title').value.trim();
-            const url = document.getElementById('link-url').value.trim();
+            const grado = prompt("Por favor ingresa el grado (Ej. 5to_Secundaria):");
+            if (!grado) return;
+            const colegio = prompt("Por favor ingresa el nombre del colegio:");
+            if (!colegio) return;
             
-            if(!title || !url) return alert('Por favor completa el t√≠tulo y la URL del enlace.');
-
-            await fetch('/api/admin/material/link', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, url })
-            });
-
-            document.getElementById('link-title').value = '';
-            document.getElementById('link-url').value = '';
-            loadStatus();
+            window.location.href = `/api/admin/download-zip?grado=${encodeURIComponent(grado)}&colegio=${encodeURIComponent(colegio)}`;
         }
 
-        // Enviar archivo f√≠sico por FormData
-        async function uploadFile() {
-            const fileInput = document.getElementById('file-input');
-            if (!fileInput.files.length) return alert('Debes seleccionar un archivo primero.');
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            const btn = document.getElementById('btn-upload');
-            btn.disabled = true;
-            btn.innerText = 'Subiendo... ‚è≥';
+        async function deleteSelectedSubmissions() {
+            const checkboxes = document.querySelectorAll(".submission-checkbox:checked");
+            const ids = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (ids.length === 0) return alert("Selecciona al menos un archivo para eliminar.");
+            if (!confirm(`øEst·s seguro de eliminar ${ids.length} archivo(s)?`)) return;
 
             try {
-                await fetch('/api/admin/material/file', {
-                    method: 'POST',
-                    body: formData
+                const res = await fetch("/api/admin/delete-submissions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ids })
                 });
-            } catch(e) {
-                alert('Error subiendo archivo');
+                if (res.ok) {
+                    loadStatus();
+                } else {
+                    alert("Error al eliminar los archivos.");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error de conexiÛn al eliminar.");
             }
-
-            fileInput.value = '';
-            btn.disabled = false;
-            btn.innerText = 'Subir Archivo (.pdf, .zip, etc)';
-            loadStatus();
         }
 
-        // Cerrar la clase y formatear la data (Destrucci√≥n total)
+        // Cerrar la clase y formatear la data (DestrucciÛn total)
         async function closeClass() {
-            const confirmacion = confirm('‚ö†Ô∏è ATENCI√ìN: ¬øEst√°s seguro de cerrar la clase? \n\nEsto borrar√° permanentemente de la memoria todos los tokens, enlaces compartidos, y ELIMINAR√Å f√≠sicamente los archivos subidos al disco. Los alumnos ser√°n desconectados inmediatamente.');
+            const confirmacion = confirm('?? ATENCI”N: øEst·s seguro de cerrar la clase? \n\nEsto borrar· permanentemente de la memoria todos los tokens, enlaces compartidos, y ELIMINAR¡ fÌsicamente los archivos subidos al disco. Los alumnos ser·n desconectados inmediatamente.');
             if (!confirmacion) return;
 
             await fetch('/api/admin/close', { method: 'POST' });
-            alert('‚úîÔ∏è La clase ha finalizado. Toda la informaci√≥n y archivos han sido destruidos por seguridad.');
+            alert('?? La clase ha finalizado. Toda la informaciÛn y archivos han sido destruidos por seguridad.');
             loadStatus();
         }
     </script>
 </body>
 </html>
+
+
 
