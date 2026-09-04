@@ -3,6 +3,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const archiver = require('archiver');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -110,6 +111,50 @@ app.get('/api/admin/download-submission/:id', (req, res) => {
     } else {
         res.status(404).send('Archivo no encontrado.');
     }
+});
+
+// Eliminar trabajos seleccionados
+app.post('/api/admin/delete-submissions', express.json(), (req, res) => {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids)) return res.status(400).json({ error: 'Datos inválidos' });
+    
+    ids.forEach(id => {
+        const index = studentSubmissions.findIndex(s => s.id === id);
+        if (index !== -1) {
+            const file = studentSubmissions[index];
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+            studentSubmissions.splice(index, 1);
+        }
+    });
+    res.json({ success: true });
+});
+
+// Descargar todos los trabajos en un archivo ZIP
+app.get('/api/admin/download-zip', (req, res) => {
+    const { colegio, grado } = req.query;
+    const safeColegio = (colegio || 'Colegio').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const safeGrado = (grado || 'Grado').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const zipName = `${safeColegio}_${safeGrado}_Trabajos.zip`;
+    
+    res.attachment(zipName);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    
+    archive.on('error', err => { res.status(500).send({ error: err.message }); });
+    archive.pipe(res);
+    
+    let hasFiles = false;
+    studentSubmissions.forEach(sub => {
+        if (fs.existsSync(sub.path)) {
+            hasFiles = true;
+            archive.file(sub.path, { name: sub.title });
+        }
+    });
+    
+    if (!hasFiles) {
+        archive.append('No se encontraron trabajos o los archivos fueron borrados.', { name: 'info.txt' });
+    }
+    
+    archive.finalize();
 });
 
 // 4. Obtener el estado actual (para refrescar el panel del profesor)
