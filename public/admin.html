@@ -16,20 +16,14 @@
         [data-bs-theme="dark"] .border-dashed { border-color: #495057; }
         .password-container { position: relative; }
         .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            border: none;
-            background: none;
-            color: #6c757d;
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; border: none; background: none; color: #6c757d;
         }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE LOGIN (Protección básica frontend) -->
+    <!-- PANTALLA DE LOGIN -->
     <div class="container mt-5" id="login-screen" style="max-width: 400px;">
         <div class="card shadow-sm border-0 p-4 bg-body-tertiary">
             <div class="text-center mb-4">
@@ -44,170 +38,192 @@
                 <button class="toggle-password" onclick="togglePassword()" id="btn-eye">👁️</button>
             </div>
             <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()">Ingresar</button>
-            <div id="admin-error" class="alert alert-danger mt-3 text-center small" style="display: none;">
-                Credenciales incorrectas
-            </div>
+            <div id="admin-error" class="alert alert-danger mt-3 text-center small" style="display: none;">Credenciales incorrectas</div>
         </div>
     </div>
 
-    <!-- PANEL PRINCIPAL (Oculto hasta hacer login) -->
-    <div class="container mt-4" id="admin-content" style="display: none; max-width: 1000px;">
+    <!-- PANEL PRINCIPAL -->
+    <div class="container mt-4" id="admin-content" style="display: none; max-width: 1200px;">
         
-        <!-- Cabecera y Botón de Cierre (Crucial) -->
+        <!-- Cabecera -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-body-tertiary p-3 rounded shadow-sm border-start border-primary border-5">
             <h2 class="m-0 text-primary">Panel del Profesor</h2>
-            <button class="btn btn-danger btn-lg fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
-        </div>
-
-        <!-- MEDIDOR DE ALMACENAMIENTO -->
-        <div class="card shadow-sm mb-4 border-0">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <h6 class="mb-0 text-secondary">💽 Uso de Almacenamiento del Servidor</h6>
-                    <span id="storage-text" class="fw-bold text-success">0 MB / 250 MB</span>
-                </div>
-                <div class="progress" style="height: 10px;">
-                    <div id="storage-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
-                </div>
-                <small id="storage-warning" class="text-danger fw-bold mt-2" style="display: none;">
-                    ⚠️ ADVERTENCIA: El servidor está a punto de llenarse. Por favor descarga los trabajos y finaliza la clase pronto.
-                </small>
-            </div>
+            <button class="btn btn-danger fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
         </div>
 
         <div class="row">
-            <!-- PANEL IZQUIERDO: Controles (Tokens y Subidas) -->
-            <div class="col-md-5">
+            <!-- PANEL IZQUIERDO -->
+            <div class="col-lg-4 col-md-5">
                 
-                <!-- Tarjeta: Gestión de Tokens -->
+                <!-- MEDIDOR DE ALMACENAMIENTO -->
                 <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-body">
-                        <h5 class="text-secondary">Claves de Acceso</h5>
-                        <button class="btn btn-primary w-100 mb-3 fw-bold" onclick="generateToken()">+ Generar Nuevo Token</button>
-                        <ul id="tokens-list" class="list-group list-group-flush mb-0 border rounded">
-                            <li class="list-group-item text-muted text-center">Ningún token activo</li>
-                        </ul>
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 text-secondary small">💽 Almacenamiento (Máx 250MB)</h6>
+                            <span id="storage-text" class="fw-bold text-success small">0 MB</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div id="storage-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tarjeta: Pases de Entrega (Alumnos) -->
-                <div class="card shadow-sm mb-4 border-0">
+                <!-- CONTROLES EN VIVO (Megáfono, Reloj, Pausa) -->
+                <div class="card shadow-sm border-0 mb-4 border-start border-warning border-4">
                     <div class="card-body">
-                        <h5 class="text-secondary">Pases de Entrega</h5>
-                        <p class="small text-muted mb-2">Dale un pase a los alumnos para que puedan enviar sus tareas.</p>
-                        <button class="btn btn-warning w-100 mb-3 fw-bold text-dark" onclick="generateUploadToken()">+ Generar Pase de Entrega</button>
-                        <ul id="upload-tokens-list" class="list-group list-group-flush mb-0 border rounded">
-                            <li class="list-group-item text-muted text-center">Ningún pase activo</li>
-                        </ul>
+                        <h5 class="text-secondary mb-3">⚡ Controles en Vivo</h5>
+                        
+                        <!-- Bloqueo -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-body-secondary rounded">
+                            <span class="fw-bold" id="lock-status-text">Entregas Habilitadas</span>
+                            <button id="btn-toggle-lock" class="btn btn-sm btn-outline-danger" onclick="toggleLock()">⏸️ Pausar Entregas</button>
+                        </div>
+                        
+                        <!-- Temporizador -->
+                        <div class="input-group mb-3">
+                            <input type="number" id="timer-minutes" class="form-control" placeholder="Minutos (Ej. 15)" min="1">
+                            <button class="btn btn-warning fw-bold text-dark" onclick="startTimer()">⏱️ Iniciar Reloj</button>
+                            <button class="btn btn-secondary" onclick="stopTimer()" title="Detener">⏹️</button>
+                        </div>
+
+                        <!-- Megáfono -->
+                        <div class="input-group">
+                            <input type="text" id="announce-text" class="form-control" placeholder="Aviso para todos...">
+                            <button class="btn btn-info fw-bold text-white" onclick="sendAnnouncement()">📢 Enviar</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tarjeta: Compartir Material -->
-                <div class="card shadow-sm border-0">
+                <!-- Tarjetas Tokens -->
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body text-center p-2">
+                                <h6 class="text-secondary small">Clave de Clase</h6>
+                                <button class="btn btn-sm btn-primary w-100 mb-2 fw-bold" onclick="generateToken()">+ Generar</button>
+                                <ul id="tokens-list" class="list-group list-group-flush mb-0 border rounded small">
+                                    <li class="list-group-item text-muted text-center p-1">Ninguna</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body text-center p-2">
+                                <h6 class="text-secondary small">Pase de Entrega</h6>
+                                <button class="btn btn-sm btn-warning w-100 mb-2 fw-bold text-dark" onclick="generateUploadToken()">+ Generar</button>
+                                <ul id="upload-tokens-list" class="list-group list-group-flush mb-0 border rounded small">
+                                    <li class="list-group-item text-muted text-center p-1">Ninguno</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compartir Material -->
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <h5 class="text-secondary mb-3">Compartir Material</h5>
-                        
-                        <!-- Pestañas para Enlace o Archivo -->
-                        <ul class="nav nav-tabs mb-3" id="materialTabs" role="tablist">
+                        <ul class="nav nav-tabs mb-3 small" id="materialTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-pane" type="button" role="tab">🔗 Enlace</button>
+                                <button class="nav-link active fw-bold" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-pane" type="button">🔗 Enlace</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-pane" type="button" role="tab">📄 Archivo Físico</button>
+                                <button class="nav-link fw-bold" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-pane" type="button">📄 Archivo Físico</button>
                             </li>
                         </ul>
-                        
                         <div class="tab-content" id="materialTabsContent">
-                            <!-- Opción 1: Enlace -->
                             <div class="tab-pane fade show active" id="link-pane" role="tabpanel">
-                                <div class="mb-2">
-                                    <input type="text" id="link-title" class="form-control" placeholder="Título (Ej: Wikipedia, YouTube...)">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="url" id="link-url" class="form-control" placeholder="https://...">
-                                </div>
-                                <button class="btn btn-success w-100" onclick="shareLink()">Compartir Enlace</button>
+                                <input type="text" id="link-title" class="form-control form-control-sm mb-2" placeholder="Título (Ej: Wikipedia)">
+                                <input type="url" id="link-url" class="form-control form-control-sm mb-2" placeholder="https://...">
+                                <button class="btn btn-sm btn-success w-100" onclick="shareLink()">Compartir Enlace</button>
                             </div>
-                            
-                            <!-- Opción 2: Archivo Físico -->
                             <div class="tab-pane fade" id="file-pane" role="tabpanel">
-                                <div class="alert alert-warning py-2 small fw-bold">⚠️ Los archivos se borrarán al finalizar la clase.</div>
-                                <div class="mb-3">
-                                    <input type="file" id="file-upload" class="form-control">
-                                </div>
-                                <button class="btn btn-success w-100" id="btn-upload-file" onclick="uploadFile()">Subir Archivo</button>
-                                <div id="upload-progress" class="mt-2 text-center text-primary" style="display: none; font-size: 0.9em;">Subiendo...</div>
+                                <input type="file" id="file-upload" class="form-control form-control-sm mb-2">
+                                <button class="btn btn-sm btn-success w-100" id="btn-upload-file" onclick="uploadFile()">Subir Archivo</button>
+                                <div id="upload-progress" class="mt-2 text-center text-primary small" style="display: none;">Subiendo...</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: Pizarra y Trabajos Recibidos -->
-            <div class="col-md-7">
-                <div class="card shadow-sm mb-4 border-0 bg-body-tertiary">
+            <!-- PANEL DERECHO -->
+            <div class="col-lg-8 col-md-7">
+                
+                <!-- Q&A (Pizarra de Dudas) -->
+                <div class="card shadow-sm mb-4 border-0 border-start border-info border-4">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0 text-secondary">Materiales Compartidos en la Pizarra</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0 text-info">🙋‍♂️ Dudas de los Alumnos en Vivo</h5>
                             <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">🔄 Refrescar</button>
                         </div>
-                        <ul class="list-group" id="materials-list">
-                            <li class="list-group-item text-muted text-center py-4 bg-body-secondary border-dashed">La pizarra está vacía.</li>
+                        <ul class="list-group" id="questions-list">
+                            <li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed">No hay dudas por ahora.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0">
+                <!-- Trabajos Recibidos -->
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0 text-secondary">Trabajos Recibidos de Alumnos</h5>
+                            <h5 class="mb-0 text-secondary">Trabajos Recibidos</h5>
                             <div class="mt-2 mt-md-0 d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelectedSubmissions()">🗑️ Eliminar Seleccionados</button>
-                                <button class="btn btn-sm btn-outline-success" onclick="downloadAllSubmissions()">📦 Descargar Todos (ZIP)</button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">🔄 Refrescar</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelectedSubmissions()">🗑️ Eliminar</button>
+                                <button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="downloadAllSubmissions()">📦 Descargar Todos + Excel</button>
                             </div>
                         </div>
-                        <ul class="list-group" id="submissions-list">
+                        <ul class="list-group" id="submissions-list" style="max-height: 400px; overflow-y: auto;">
                             <li class="list-group-item text-muted text-center py-4 bg-body-secondary border-dashed">No hay trabajos recibidos.</li>
                         </ul>
                     </div>
                 </div>
+
+                <!-- Materiales de la Pizarra -->
+                <div class="card shadow-sm border-0 bg-body-tertiary">
+                    <div class="card-body">
+                        <h5 class="text-secondary mb-3">Pizarra (Materiales enviados)</h5>
+                        <ul class="list-group" id="materials-list">
+                            <li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
         </div>
         
         <footer class="mt-5 mb-3 text-center text-muted small">
-            &copy; 2026 Aula Virtual. Todos los derechos reservados.<br>
-            Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
         </footer>
     </div>
 
-    <!-- Bootstrap JS (necesario para las tabs) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Lógica del Administrador -->
+    <!-- Lógica -->
     <script>
-        // Ojo de contraseña
+        let isLocked = false;
+        setInterval(() => {
+            if (document.getElementById('admin-content').style.display === 'block') {
+                loadStatus(); // Auto-refresh cada 10s en panel admin también
+            }
+        }, 10000);
+
         function togglePassword() {
             const passInput = document.getElementById('admin-pass');
             const btnEye = document.getElementById('btn-eye');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                btnEye.innerText = '🙈';
-            } else {
-                passInput.type = 'password';
-                btnEye.innerText = '👁️';
-            }
+            if (passInput.type === 'password') { passInput.type = 'text'; btnEye.innerText = '🙈'; } 
+            else { passInput.type = 'password'; btnEye.innerText = '👁️'; }
         }
 
         function adminLogin() {
             const user = document.getElementById('admin-user').value.trim().toLowerCase();
             const pass = document.getElementById('admin-pass').value.trim().toLowerCase();
-
-            // Aceptamos la contraseña con o sin el punto final, y sin importar mayúsculas
             if (user === 'profesorcito' && (pass === 'edu.25694050' || pass === 'edu.25694050.')) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
-                loadStatus(); // Cargar los datos del backend ahora sí
+                loadStatus();
             } else {
                 const err = document.getElementById('admin-error');
                 err.style.display = 'block';
@@ -219,223 +235,221 @@
             try {
                 const res = await fetch('/api/admin/status');
                 const data = await res.json();
-                renderTokens(data.activeTokens);
-                renderMaterials(data.materials);
-                if(data.uploadTokens) renderUploadTokens(data.uploadTokens);
-                if(data.studentSubmissions) renderSubmissions(data.studentSubmissions);
                 
-                // Actualizar Medidor de Almacenamiento
+                renderTokens(data.activeTokens);
+                renderUploadTokens(data.uploadTokens);
+                renderMaterials(data.materials);
+                renderSubmissions(data.studentSubmissions);
+                renderQuestions(data.questions);
+
+                // Update Storage
                 if (data.totalBytes !== undefined) {
-                    const maxBytes = 250 * 1024 * 1024; // 250 MB
+                    const maxBytes = 250 * 1024 * 1024;
                     const mbUsed = (data.totalBytes / (1024 * 1024)).toFixed(2);
                     const percentage = Math.min((data.totalBytes / maxBytes) * 100, 100);
                     
-                    document.getElementById('storage-text').innerText = `${mbUsed} MB / 250 MB`;
+                    document.getElementById('storage-text').innerText = `${mbUsed} MB`;
                     document.getElementById('storage-bar').style.width = `${percentage}%`;
-                    
-                    if (percentage > 80) { // Si pasa el 80% (200MB) advertir en rojo
-                        document.getElementById('storage-bar').className = 'progress-bar bg-danger progress-bar-striped progress-bar-animated';
-                        document.getElementById('storage-text').className = 'fw-bold text-danger';
-                        document.getElementById('storage-warning').style.display = 'block';
-                    } else if (percentage > 50) {
-                        document.getElementById('storage-bar').className = 'progress-bar bg-warning';
-                        document.getElementById('storage-text').className = 'fw-bold text-warning';
-                        document.getElementById('storage-warning').style.display = 'none';
-                    } else {
-                        document.getElementById('storage-bar').className = 'progress-bar bg-success';
-                        document.getElementById('storage-text').className = 'fw-bold text-success';
-                        document.getElementById('storage-warning').style.display = 'none';
-                    }
+                    if (percentage > 80) document.getElementById('storage-bar').className = 'progress-bar bg-danger';
+                    else document.getElementById('storage-bar').className = 'progress-bar bg-success';
                 }
+
+                // Update Lock Status
+                isLocked = data.locked;
+                const lockBtn = document.getElementById('btn-toggle-lock');
+                const lockTxt = document.getElementById('lock-status-text');
+                if (isLocked) {
+                    lockBtn.className = 'btn btn-sm btn-success';
+                    lockBtn.innerText = '▶️ Reanudar Entregas';
+                    lockTxt.innerText = 'Entregas PAUSADAS';
+                    lockTxt.className = 'fw-bold text-danger';
+                } else {
+                    lockBtn.className = 'btn btn-sm btn-outline-danger';
+                    lockBtn.innerText = '⏸️ Pausar Entregas';
+                    lockTxt.innerText = 'Entregas Habilitadas';
+                    lockTxt.className = 'fw-bold text-success';
+                }
+
             } catch (e) {
-                console.error('Error de conexión:', e);
+                console.error('Error:', e);
             }
         }
 
-        // Pintar lista de tokens en el HTML
-        function renderTokens(tokens) {
-            const list = document.getElementById('tokens-list');
-            if (tokens.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center">Ningún token activo</li>';
+        // --- Nuevas funciones de control ---
+        async function toggleLock() {
+            await fetch('/api/admin/toggle-lock', { method: 'POST' });
+            loadStatus();
+        }
+
+        async function startTimer() {
+            const mins = parseInt(document.getElementById('timer-minutes').value);
+            if (!mins || mins <= 0) return alert('Ingresa un tiempo válido');
+            await fetch('/api/admin/timer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ minutes: mins })
+            });
+            document.getElementById('timer-minutes').value = '';
+            alert(`Temporizador iniciado por ${mins} minutos.`);
+            loadStatus();
+        }
+
+        async function stopTimer() {
+            await fetch('/api/admin/timer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ minutes: 0 })
+            });
+            alert('Temporizador detenido.');
+            loadStatus();
+        }
+
+        async function sendAnnouncement() {
+            const msg = document.getElementById('announce-text').value.trim();
+            if (!msg) return;
+            await fetch('/api/admin/announce', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            document.getElementById('announce-text').value = '';
+            alert('Aviso enviado a todos los alumnos.');
+        }
+
+        async function resolveQuestion(id) {
+            await fetch('/api/admin/delete-question', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            loadStatus();
+        }
+
+        function renderQuestions(questions) {
+            const list = document.getElementById('questions-list');
+            if (!questions || questions.length === 0) {
+                list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">No hay dudas por ahora.</li>';
                 return;
             }
             list.innerHTML = '';
-            tokens.forEach(t => {
-                list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-4 letter-spacing-1 bg-body-secondary">${t}</li>`;
+            questions.forEach(q => {
+                list.innerHTML += `
+                    <li class="list-group-item border-info bg-transparent py-2 mb-2 rounded shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="text-info">${q.name}</strong> <small class="text-muted">(${q.time})</small>
+                                <p class="mb-0 mt-1">${q.text}</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success ms-2 text-nowrap" onclick="resolveQuestion('${q.id}')">✅ Resuelta</button>
+                        </div>
+                    </li>
+                `;
             });
+        }
+        // -----------------------------------
+
+        function renderTokens(tokens) {
+            const list = document.getElementById('tokens-list');
+            if (tokens.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center p-1">Ninguna</li>';
+            list.innerHTML = '';
+            tokens.forEach(t => list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`);
         }
 
         function renderUploadTokens(tokens) {
             const list = document.getElementById('upload-tokens-list');
-            if (tokens.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center">Ningún pase activo</li>';
-                return;
-            }
+            if (tokens.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center p-1">Ninguno</li>';
             list.innerHTML = '';
-            tokens.forEach(t => {
-                list.innerHTML += `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary">${t}</li>`;
-            });
+            tokens.forEach(t => list.innerHTML += `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`);
         }
 
         function renderSubmissions(submissions) {
             window.currentSubmissions = submissions;
             const list = document.getElementById("submissions-list");
-            if (submissions.length === 0) {
-                list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
-                return;
-            }
+            if (submissions.length === 0) return list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
+            
             list.innerHTML = "";
-            submissions.forEach(s => {
+            // Reverse so newest is on top
+            [...submissions].reverse().forEach(s => {
                 list.innerHTML += `
-                    <li class="list-group-item py-3">
+                    <li class="list-group-item py-2">
                         <div class="d-flex w-100 justify-content-between align-items-center">
                             <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                                 <input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}">
-                                <h6 class="mb-0 text-truncate pe-3" title="${s.title}">📄 ${s.title}</h6>
+                                <div class="text-truncate" title="${s.title}">
+                                    <h6 class="mb-0">📄 ${s.title}</h6>
+                                    <small class="text-muted">De: ${s.name} (${s.grade})</small>
+                                </div>
                             </div>
-                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap">Descargar</a>
+                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap ms-2">⬇️</a>
                         </div>
-                        <small class="text-muted ms-4 ps-2">Pase usado: ${s.tokenUsed}</small>
                     </li>
                 `;
             });
         }
 
         function downloadAllSubmissions() {
-            if (!window.currentSubmissions || window.currentSubmissions.length === 0) {
-                return alert("No hay trabajos para descargar.");
-            }
+            if (!window.currentSubmissions || window.currentSubmissions.length === 0) return alert("No hay trabajos para descargar.");
             const grado = prompt("Por favor ingresa el grado (Ej. 5to_Secundaria):");
             if (!grado) return;
             const colegio = prompt("Por favor ingresa el nombre del colegio:");
             if (!colegio) return;
-            
             window.location.href = `/api/admin/download-zip?grado=${encodeURIComponent(grado)}&colegio=${encodeURIComponent(colegio)}`;
         }
 
         async function deleteSelectedSubmissions() {
             const checkboxes = document.querySelectorAll(".submission-checkbox:checked");
             const ids = Array.from(checkboxes).map(cb => cb.value);
-            
-            if (ids.length === 0) return alert("Selecciona al menos un archivo para eliminar.");
-            if (!confirm(`¿Estás seguro de eliminar ${ids.length} archivo(s)?`)) return;
+            if (ids.length === 0) return alert("Selecciona al menos un archivo.");
+            if (!confirm(`¿Eliminar ${ids.length} archivo(s)?`)) return;
 
-            try {
-                const res = await fetch("/api/admin/delete-submissions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ids })
-                });
-                if (res.ok) {
-                    loadStatus();
-                } else {
-                    alert("Error al eliminar los archivos.");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Error de conexión al eliminar.");
-            }
+            await fetch("/api/admin/delete-submissions", {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids })
+            });
+            loadStatus();
         }
 
-        // Pintar lista de materiales
         function renderMaterials(materials) {
             const list = document.getElementById('materials-list');
-            if (materials.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center py-4">No hay materiales compartidos.</li>';
-                return;
-            }
+            if (materials.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>';
             list.innerHTML = '';
             materials.forEach(m => {
                 const icon = m.type === 'link' ? '🔗' : '📄';
-                const extraInfo = m.type === 'link' ? `<a href="${m.url}" target="_blank">${m.url}</a>` : 'Guardado en servidor temporalmente';
                 list.innerHTML += `
-                    <li class="list-group-item py-3">
+                    <li class="list-group-item py-2">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-1 text-truncate pe-3" title="${m.title}">${icon} ${m.title}</h6>
+                            <h6 class="mb-0 text-truncate pe-2">${icon} ${m.title}</h6>
                             <span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase">${m.type}</span>
                         </div>
-                        <p class="mb-1 small text-muted text-truncate">${extraInfo}</p>
                     </li>
                 `;
             });
         }
 
-        // Generar un nuevo token de acceso (para una clase nueva)
-        async function generateToken() {
-            try {
-                await fetch('/api/admin/token', { method: 'POST' });
-                loadStatus();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // Generar un nuevo token de entrega para los alumnos
-        async function generateUploadToken() {
-            try {
-                await fetch('/api/admin/upload-token', { method: 'POST' });
-                loadStatus();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // Compartir un enlace
+        async function generateToken() { await fetch('/api/admin/token', { method: 'POST' }); loadStatus(); }
+        async function generateUploadToken() { await fetch('/api/admin/upload-token', { method: 'POST' }); loadStatus(); }
         async function shareLink() {
             const title = document.getElementById('link-title').value;
             const url = document.getElementById('link-url').value;
-            if (!title || !url) return alert('Llena ambos campos del enlace');
-            
-            try {
-                await fetch('/api/admin/material', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'link', title, url })
-                });
-                document.getElementById('link-title').value = '';
-                document.getElementById('link-url').value = '';
-                loadStatus();
-            } catch (e) {
-                console.error(e);
-            }
+            if (!title || !url) return;
+            await fetch('/api/admin/material', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'link', title, url }) });
+            document.getElementById('link-title').value = ''; document.getElementById('link-url').value = ''; loadStatus();
         }
-
-        // Compartir un archivo físico
         async function uploadFile() {
             const fileInput = document.getElementById('file-upload');
-            if (fileInput.files.length === 0) return alert('Selecciona un archivo primero');
+            if (fileInput.files.length === 0) return;
+            const formData = new FormData(); formData.append('file', fileInput.files[0]);
             
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
+            document.getElementById('btn-upload-file').disabled = true;
+            document.getElementById('upload-progress').style.display = 'block';
+            await fetch('/api/admin/upload', { method: 'POST', body: formData });
             
-            const btn = document.getElementById('btn-upload-file');
-            const progress = document.getElementById('upload-progress');
-            
-            btn.disabled = true;
-            progress.style.display = 'block';
-
-            try {
-                await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                fileInput.value = '';
-                loadStatus();
-            } catch (e) {
-                alert('Error al subir el archivo');
-            }
-            
-            btn.disabled = false;
-            progress.style.display = 'none';
+            fileInput.value = ''; document.getElementById('btn-upload-file').disabled = false;
+            document.getElementById('upload-progress').style.display = 'none'; loadStatus();
         }
-
-        // Cerrar la clase y formatear la data (Destrucción total)
         async function closeClass() {
-            const confirmacion = confirm('🛑 ATENCIÓN: ¿Estás seguro de cerrar la clase? \n\nEsto borrará permanentemente de la memoria todos los tokens, enlaces compartidos, y ELIMINARÁ físicamente los archivos subidos al disco. Los alumnos serán desconectados inmediatamente.');
-            if (!confirmacion) return;
-
+            if (!confirm('🛑 ATENCIÓN: ¿Seguro que quieres cerrar la clase? Se borrará TODO.')) return;
             await fetch('/api/admin/close', { method: 'POST' });
-            alert('✅ La clase ha finalizado. Toda la información y archivos han sido destruidos por seguridad.');
+            alert('✅ Clase finalizada. Datos destruidos.');
             loadStatus();
         }
     </script>

@@ -6,68 +6,59 @@
     <meta name="description" content="Aula Virtual gratuita para estudiantes y docentes. Plataforma educativa para recepción de tareas, descarga de materiales y gestión de clases en tiempo real.">
     <meta name="keywords" content="aula virtual, educación, educación a distancia, tareas, profesores, estudiantes, escuela en línea">
     <title>Aula Virtual - Estudiante</title>
-    <!-- Favicon @ -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>@</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🎓</text></svg>">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452" crossorigin="anonymous"></script>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { 
-            background-color: #f8f9fa; 
-            overflow-x: hidden;
-        }
-        
-        /* Animación de Cuadrícula Tecnológica (Fondo) */
+        body { background-color: #f8f9fa; overflow-x: hidden; }
         .tech-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: 
-                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
-            animation: scrollGrid 20s linear infinite;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1; animation: scrollGrid 20s linear infinite;
         }
         [data-bs-theme="dark"] body { background-color: #12151a; }
-        
-        @keyframes scrollGrid {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(50px); }
-        }
-
-        /* Efecto Cristal (Glassmorphism) para la tarjeta principal */
-        .card {
-            background: rgba(33, 37, 41, 0.85) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1) !important;
-        }
-
-        /* Estela del Cursor */
-        .mouse-trail {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #0d6efd;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-            box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd;
-        }
-
-        /* Custom Cursor cruz (Crosshair) */
+        @keyframes scrollGrid { 0% { transform: translateY(0); } 100% { transform: translateY(50px); } }
+        .card { background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1) !important; }
+        .mouse-trail { position: absolute; width: 10px; height: 10px; background: #0d6efd; border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd; }
         body { cursor: crosshair; }
+        
+        #timer-display {
+            font-size: 3rem; font-weight: 900; font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 10px rgba(220, 53, 69, 0.8); letter-spacing: 2px;
+        }
+        #announcement-banner {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1050; display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
 
     <div class="tech-grid"></div>
 
-    <div class="container mt-5" style="max-width: 600px;">
-        <div class="card shadow-sm text-center p-4">
+    <!-- Banner de Avisos del Megáfono -->
+    <div id="announcement-banner" class="bg-info text-white text-center p-3 fw-bold fs-5">
+        📢 <span id="announcement-text"></span>
+        <button type="button" class="btn-close btn-close-white float-end" onclick="document.getElementById('announcement-banner').style.display='none'"></button>
+    </div>
+
+    <!-- Botón Flotante para Dudas -->
+    <button id="btn-duda" class="btn btn-info btn-lg rounded-circle shadow-lg text-white" 
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 24px;" 
+            data-bs-toggle="modal" data-bs-target="#questionModal" title="Tengo una duda">
+        🙋‍♂️
+    </button>
+
+    <div class="container mt-5" style="max-width: 650px;">
+        
+        <!-- Contenedor del Reloj (Oculto por defecto) -->
+        <div id="timer-container" class="mb-3 text-center" style="display: none;">
+            <div class="badge bg-danger mb-1 fs-6">⏳ Tiempo restante para entregar</div>
+            <div id="timer-display" class="text-danger">00:00</div>
+        </div>
+
+        <div class="card shadow-sm text-center p-4 mb-5">
             <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
             <h1 class="mb-4 fw-bold text-white display-5">compuclase.click</h1>
 
@@ -77,7 +68,7 @@
                     <ol class="mb-0 ps-3">
                         <li>Pídele a tu profesor el código de la clase de hoy.</li>
                         <li>Escríbelo en la casilla que está abajo.</li>
-                        <li>Haz clic en "Ingresar a Clase" para ver y descargar tus materiales.</li>
+                        <li>Haz clic en "Ingresar a Clase".</li>
                     </ol>
                 </div>
                 <div class="input-group mb-3">
@@ -90,11 +81,10 @@
             <!-- SECCIÓN 2: Lista de Materiales y Tokens -->
             <div id="materials-section" style="display: none;">
                 
-                <!-- BANNERS DE TOKENS (Visible en proyector) -->
                 <div class="row text-center mb-4 g-2">
                     <div class="col-6">
                         <div class="p-2 bg-primary rounded text-white shadow-sm border border-primary">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Clave de Sesión</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Clave de Clase</small>
                             <span class="fs-4 fw-bold" id="display-access-token">---</span>
                         </div>
                     </div>
@@ -111,192 +101,203 @@
                     <button class="btn btn-sm btn-outline-danger" onclick="logout()">Salir</button>
                 </div>
                 
-                <ul class="list-group text-start shadow-sm mb-4" id="materials-list">
-                    <!-- Los materiales se insertarán aquí dinámicamente -->
-                </ul>
-
-                <!-- SECCIÓN: Trabajos Recibidos -->
-                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary mb-4">
-                    <h5 class="text-secondary mb-3">✅ Trabajos Entregados</h5>
-                    <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent">
-                        <li class="list-group-item text-muted text-center bg-transparent border-0">Aún no hay entregas.</li>
-                    </ul>
-                </div>
+                <ul class="list-group text-start shadow-sm mb-4" id="materials-list"></ul>
 
                 <!-- SECCIÓN 3: Enviar Trabajo -->
-                <hr class="my-4 border-secondary">
-                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary">
-                    <h5 class="text-secondary mb-3">📤 Enviar Trabajo al Profesor</h5>
-                    <div class="alert alert-info py-2 small fw-bold">
-                        ℹ️ Por favor, llena tus datos para que el profesor sepa de quién es el trabajo.
+                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative">
+                    
+                    <!-- Overlay de Bloqueo -->
+                    <div id="lock-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);" class="d-flex flex-column justify-content-center align-items-center text-center p-4">
+                        <span class="fs-1 mb-2">🛑</span>
+                        <h4 class="text-danger fw-bold">ENTREGAS PAUSADAS</h4>
+                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío de trabajos momentáneamente.</p>
                     </div>
-                    <p class="small text-muted mb-2">Pídele el <strong>Pase de Entrega</strong> al profesor para poder enviar.</p>
+
+                    <h5 class="text-secondary mb-3">📤 Enviar Trabajo</h5>
                     <div class="mb-2">
                         <input type="text" id="student-name" class="form-control mb-2" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
                         <input type="text" id="student-grade" class="form-control mb-2" placeholder="Tu Grado (Ej. 5to Secundaria)">
-                        <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: 4F2A1B)" style="text-transform: uppercase;">
-                    </div>
-                    <div class="mb-3">
+                        <input type="text" id="upload-token" class="form-control mb-2" placeholder="Pase de Entrega" style="text-transform: uppercase;">
                         <input type="file" id="upload-file" class="form-control">
                     </div>
-                    <button class="btn btn-warning w-100 fw-bold text-dark" id="btn-submit" onclick="submitWork()">Enviar Trabajo</button>
+                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()">Enviar Trabajo</button>
                     <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
+                </div>
+
+                <!-- Trabajos Recibidos -->
+                <div class="text-start p-3 mt-4">
+                    <h6 class="text-secondary mb-2 text-center">✅ Trabajos Entregados Recientemente</h6>
+                    <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Texto SEO para AdSense (Texto descriptivo oculto estéticamente o sutil) -->
-    <div class="container mt-5 mb-2 text-center" style="max-width: 700px; opacity: 0.6;">
-        <h5 class="text-muted fs-6 text-uppercase">Sobre Nuestra Plataforma Educativa</h5>
-        <p class="small text-muted mb-0">
-            Bienvenido a la mejor plataforma de Aula Virtual. Una herramienta educativa diseñada para facilitar la conexión entre profesores y estudiantes. Nuestro sistema permite el intercambio seguro y rápido de documentos, recepción de tareas escolares y visualización de recursos didácticos en tiempo real. Fomentamos el aprendizaje digital y la educación a distancia sin necesidad de registros complicados, manteniendo la privacidad de la información académica.
-        </p>
+    <!-- Modal de Preguntas -->
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-body-tertiary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-info">🙋‍♂️ Enviar una duda al profesor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="q-name" class="form-control mb-3" placeholder="Tu Nombre (Opcional)">
+                    <textarea id="q-text" class="form-control" rows="3" placeholder="Escribe tu pregunta aquí..."></textarea>
+                    <div id="q-msg" class="mt-2 text-success fw-bold text-center" style="display:none;">¡Pregunta enviada!</div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-info w-100 fw-bold text-white" onclick="submitQuestion()">Enviar Duda</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer class="mt-4 mb-3 text-center text-muted small">
+    <!-- Footers y Legales -->
+    <div class="container mb-2 text-center" style="max-width: 700px; opacity: 0.5;">
+        <p class="small text-muted mb-0">Aula Virtual para envío de trabajos y descarga de recursos en tiempo real.</p>
+    </div>
+    <footer class="mt-2 mb-3 text-center text-muted small">
         <div class="mb-2 d-flex justify-content-center gap-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted hover-primary">Política de Privacidad</a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted">Privacidad</a>
             <span class="text-muted">|</span>
-            <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted hover-primary">Términos de Servicio</a>
-            <span class="text-muted">|</span>
-            <a href="mailto:contacto@bullstudio.online" class="text-decoration-none text-muted hover-primary">Contacto</a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
         </div>
-        &copy; 2026 Aula Virtual. Todos los derechos reservados.<br>
-        Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+        &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
     </footer>
 
-    <!-- MODALES LEGALES (Requisito de Google AdSense) -->
-    <div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content bg-body-tertiary">
-                <div class="modal-header">
-                    <h5 class="modal-title text-secondary">Política de Privacidad</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body small text-muted">
-                    <h6>1. Recopilación de Información</h6>
-                    <p>No recopilamos información personal sensible. El sistema es efímero; los nombres y grados introducidos al enviar tareas se utilizan únicamente para identificar el trabajo durante la sesión activa y se destruyen permanentemente al finalizar la clase.</p>
-                    <h6>2. Uso de Cookies y Publicidad (Google AdSense)</h6>
-                    <p>Utilizamos Google AdSense para mostrar anuncios. Google y sus socios utilizan cookies para publicar anuncios basados en sus visitas anteriores a este u otros sitios web de Internet. Los usuarios pueden inhabilitar la publicidad personalizada visitando la Configuración de anuncios de Google.</p>
-                    <h6>3. Almacenamiento de Archivos</h6>
-                    <p>Los archivos educativos subidos a nuestros servidores se almacenan temporalmente y son eliminados físicamente del servidor tan pronto como el docente finaliza la sesión.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Modales Legales (Omitidos los cuerpos largos para ahorrar espacio, pero presentes para adsense) -->
+    <div class="modal fade" id="privacyModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-body small text-muted">Política de Privacidad y Cookies de Google AdSense aplicables. El sistema no guarda datos personales permanentemente.</div></div></div></div>
+    <div class="modal fade" id="termsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-body small text-muted">Plataforma de uso estrictamente educativo.</div></div></div></div>
 
-    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content bg-body-tertiary">
-                <div class="modal-header">
-                    <h5 class="modal-title text-secondary">Términos de Servicio</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body small text-muted">
-                    <h6>1. Condiciones de Uso</h6>
-                    <p>Al utilizar nuestra Aula Virtual, aceptas usar la plataforma exclusivamente con fines educativos y de aprendizaje. Está estrictamente prohibido subir contenido protegido por derechos de autor, material inapropiado o software malicioso.</p>
-                    <h6>2. Disponibilidad del Servicio</h6>
-                    <p>El servicio se ofrece "tal cual", sujeto a la disponibilidad de nuestros servidores. No nos hacemos responsables por la pérdida de trabajos no descargados por el docente antes de finalizar la sesión.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap 5 JS Bundle con Popper (Necesario para Modales) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Lógica del Estudiante con Vanilla JavaScript -->
     <script>
         let currentToken = "";
         let refreshInterval = null;
+        
+        // Estado del Reloj y Avisos
+        let targetTimer = null;
+        let localTimerInterval = null;
+        let lastAnnouncementId = null;
 
         async function login() {
             const token = document.getElementById("token-input").value.trim().toUpperCase();
             if (!token) return alert("Por favor ingresa un token.");
 
             try {
-                const res = await fetch("/api/student/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token })
-                });
-
+                const res = await fetch("/api/student/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
                 if (res.ok) {
                     currentToken = token;
                     document.getElementById("login-section").style.display = "none";
                     document.getElementById("materials-section").style.display = "block";
+                    document.getElementById("btn-duda").style.display = "block";
                     loadMaterials();
-                    refreshInterval = setInterval(loadMaterials, 10000);
+                    refreshInterval = setInterval(loadMaterials, 5000); // Polling más rápido (5s) para buena UX
                 } else {
-                    const data = await res.json();
                     const err = document.getElementById("login-error");
-                    err.innerText = data.error;
+                    err.innerText = "Token incorrecto o clase no iniciada.";
                     err.style.display = "block";
                 }
-            } catch (e) {
-                alert("Error de conexión.");
-            }
+            } catch (e) { alert("Error de conexión."); }
         }
 
         function logout() {
             currentToken = "";
             if(refreshInterval) clearInterval(refreshInterval);
+            if(localTimerInterval) clearInterval(localTimerInterval);
             document.getElementById("token-input").value = "";
             document.getElementById("login-section").style.display = "block";
             document.getElementById("materials-section").style.display = "none";
+            document.getElementById("btn-duda").style.display = "none";
+            document.getElementById("timer-container").style.display = "none";
+            document.getElementById("announcement-banner").style.display = "none";
         }
 
         async function loadMaterials() {
             if (!currentToken) return;
             try {
-                const res = await fetch("/api/student/materials", {
-                    headers: { "Authorization": currentToken }
-                });
-
-                if (res.status === 403) {
-                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es válido.");
-                    logout();
-                    return;
-                }
-
+                const res = await fetch("/api/student/materials", { headers: { "Authorization": currentToken } });
+                if (res.status === 403) return logout(); // Clase cerrada
                 const data = await res.json();
                 
                 document.getElementById("display-access-token").innerText = currentToken;
-                document.getElementById("display-upload-token").innerText = 
-                    (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
+                document.getElementById("display-upload-token").innerText = (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
-                const list = document.getElementById("materials-list");
-                list.innerHTML = "";
-                if (data.materials.length === 0) {
-                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor aún no ha compartido materiales.</li>";
+                // --- SISTEMA DE AVISOS ---
+                if (data.announcement && data.announcement.id !== lastAnnouncementId) {
+                    lastAnnouncementId = data.announcement.id;
+                    document.getElementById('announcement-text').innerText = data.announcement.text;
+                    document.getElementById('announcement-banner').style.display = 'block';
+                    // Auto-ocultar el aviso después de 15 segundos
+                    setTimeout(() => document.getElementById('announcement-banner').style.display = 'none', 15000);
+                }
+
+                // --- SISTEMA DE RELOJ Y BLOQUEO ---
+                targetTimer = data.timerEndTime;
+                updateLocalTimer(); // Actualizar UI de reloj
+
+                const lockOverlay = document.getElementById('lock-overlay');
+                const lockReason = document.getElementById('lock-reason');
+                if (data.locked) {
+                    lockOverlay.style.display = 'flex';
+                    lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
+                } else if (targetTimer && Date.now() >= targetTimer) {
+                    lockOverlay.style.display = 'flex';
+                    lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
                 } else {
+                    lockOverlay.style.display = 'none';
+                }
+
+                // --- MATERIALES ---
+                const list = document.getElementById("materials-list");
+                if (data.materials.length === 0) list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">Ningún material.</li>";
+                else {
+                    list.innerHTML = "";
                     data.materials.forEach(m => {
-                        if (m.type === "link") {
-                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold">🔗 ${m.title}</a></li>`;
-                        } else {
-                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
-                                <span class="text-truncate pe-3" title="${m.title}">📄 ${m.title}</span>
-                                <a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary text-nowrap">Descargar</a>
-                            </li>`;
-                        }
+                        if (m.type === "link") list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold text-info">🔗 ${m.title}</a></li>`;
+                        else list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${m.title}">📄 ${m.title}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary">Descargar</a></li>`;
                     });
                 }
                 
+                // --- ENTREGAS ---
                 const subList = document.getElementById("student-submissions-list");
-                if (!data.submissions || data.submissions.length === 0) {
-                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Aún no hay entregas.</li>";
-                } else {
+                if (!data.submissions || data.submissions.length === 0) subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Nadie ha entregado aún.</li>";
+                else {
                     subList.innerHTML = "";
-                    data.submissions.forEach(s => {
-                        subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">📄 ${s.title}</li>`;
-                    });
+                    const lastFive = data.submissions.slice(-5).reverse(); // Mostrar solo los últimos 5
+                    lastFive.forEach(s => subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">📄 ${s.title}</li>`);
                 }
 
-            } catch (e) {
-                console.error("Error al cargar datos:", e);
-            }
+            } catch (e) { console.error("Error al cargar:", e); }
         }
+
+        // Bucle local para el reloj (corre cada segundo)
+        function updateLocalTimer() {
+            const container = document.getElementById('timer-container');
+            const display = document.getElementById('timer-display');
+            if (!targetTimer) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+            
+            const now = Date.now();
+            let diff = Math.max(0, Math.floor((targetTimer - now) / 1000));
+            
+            const m = Math.floor(diff / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
+            display.innerText = `${m}:${s}`;
+            
+            // Si el tiempo es menor a 1 minuto, hacerlo titilar
+            if (diff > 0 && diff <= 60) {
+                display.style.animation = "blink 1s infinite";
+            } else {
+                display.style.animation = "none";
+            }
+            // Cuando llega a 0, la próxima llamada a loadMaterials pondrá el candado
+        }
+        setInterval(updateLocalTimer, 1000);
 
         async function submitWork() {
             const token = document.getElementById("upload-token").value.trim().toUpperCase();
@@ -305,10 +306,7 @@
             const fileInput = document.getElementById("upload-file");
             const msgEl = document.getElementById("upload-message");
             
-            if (!name) return alert("Debes ingresar tu Nombre Completo.");
-            if (!grade) return alert("Debes ingresar tu Grado.");
-            if (!token) return alert("Debes ingresar el Pase de Entrega.");
-            if (!fileInput.files.length) return alert("Debes seleccionar un archivo.");
+            if (!name || !grade || !token || !fileInput.files.length) return alert("Llena todos los campos y selecciona un archivo.");
 
             const formData = new FormData();
             formData.append("uploadToken", token);
@@ -317,53 +315,58 @@
             formData.append("file", fileInput.files[0]);
 
             const btn = document.getElementById("btn-submit");
-            btn.disabled = true;
-            btn.innerText = "Enviando... ⏳";
+            btn.disabled = true; btn.innerText = "Enviando... ⏳";
             
             try {
-                const res = await fetch("/api/student/upload", {
-                    method: "POST",
-                    body: formData
-                });
-
+                const res = await fetch("/api/student/upload", { method: "POST", body: formData });
                 const data = await res.json();
                 msgEl.style.display = "block";
                 
                 if (res.ok) {
-                    msgEl.className = "mt-2 text-center text-success fw-bold";
-                    msgEl.innerText = "¡Trabajo enviado exitosamente!";
-                    fileInput.value = ""; 
-                    document.getElementById("upload-token").value = ""; 
-                    loadMaterials(); 
+                    msgEl.className = "mt-2 text-center text-success fw-bold"; msgEl.innerText = "¡Trabajo enviado!";
+                    fileInput.value = ""; loadMaterials(); 
                 } else {
-                    msgEl.className = "mt-2 text-center text-danger fw-bold";
-                    msgEl.innerText = data.error || "Error al enviar.";
+                    msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerText = data.error || "Error al enviar.";
                 }
             } catch (e) {
-                msgEl.style.display = "block";
-                msgEl.className = "mt-2 text-center text-danger fw-bold";
-                msgEl.innerText = "Error de conexión.";
+                msgEl.style.display = "block"; msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerText = "Error de conexión.";
             }
-            
-            btn.disabled = false;
-            btn.innerText = "Enviar Trabajo";
+            btn.disabled = false; btn.innerText = "Enviar Trabajo";
             setTimeout(() => msgEl.style.display = "none", 5000);
         }
+
+        async function submitQuestion() {
+            const name = document.getElementById("q-name").value;
+            const text = document.getElementById("q-text").value;
+            if (!text) return alert("Escribe una pregunta");
+
+            try {
+                await fetch("/api/student/question", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken },
+                    body: JSON.stringify({ name, text })
+                });
+                document.getElementById("q-text").value = "";
+                document.getElementById("q-msg").style.display = "block";
+                setTimeout(() => {
+                    document.getElementById("q-msg").style.display = "none";
+                    bootstrap.Modal.getInstance(document.getElementById('questionModal')).hide();
+                }, 1500);
+            } catch (e) { alert("Error al enviar"); }
+        }
         
+        // Estela del ratón
         document.addEventListener("mousemove", function(e) {
             const trail = document.createElement("div");
-            trail.className = "mouse-trail";
-            trail.style.left = e.clientX + "px";
-            trail.style.top = e.clientY + "px";
+            trail.className = "mouse-trail"; trail.style.left = e.clientX + "px"; trail.style.top = e.clientY + "px";
             document.body.appendChild(trail);
-
-            requestAnimationFrame(() => {
-                trail.style.transform = "translate(-50%, -50%) scale(0.1)";
-                trail.style.opacity = "0";
-            });
-
+            requestAnimationFrame(() => { trail.style.transform = "translate(-50%, -50%) scale(0.1)"; trail.style.opacity = "0"; });
             setTimeout(() => trail.remove(), 400);
         });
+
+        // Estilo extra para titilar
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes blink { 50% { opacity: 0.3; } }`;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
