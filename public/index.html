@@ -19,21 +19,40 @@
     <style>
         body { 
             margin: 0; padding: 0; overflow-x: hidden;
-            background: linear-gradient(-45deg, #09121a, #11283d, #083344, #1e1b4b);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
             color: #f8f9fa;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        
+        /* EFECTO VISUAL ANIMADO (CUBOS FLOTANTES Y FONDO INTENSO) */
+        .bg-animated {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: #0f172a; 
+            overflow: hidden;
+        }
+        .bg-animated .square {
+            position: absolute; bottom: -120px;
+            background: rgba(56, 189, 248, 0.05); 
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+            animation: floatUp linear infinite;
+        }
+        .sq-1 { left: 10%; width: 80px; height: 80px; animation-duration: 15s; }
+        .sq-2 { left: 30%; width: 50px; height: 50px; animation-duration: 12s; animation-delay: 2s; }
+        .sq-3 { left: 60%; width: 120px; height: 120px; animation-duration: 22s; }
+        .sq-4 { left: 85%; width: 60px; height: 60px; animation-duration: 14s; animation-delay: 5s; }
+        .sq-5 { left: 45%; width: 40px; height: 40px; animation-duration: 10s; animation-delay: 1s; }
+        .sq-6 { left: 75%; width: 90px; height: 90px; animation-duration: 18s; animation-delay: 7s; }
+        .sq-7 { left: 20%; width: 70px; height: 70px; animation-duration: 16s; animation-delay: 4s; }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
         .card { 
-            background: rgba(20, 25, 30, 0.75) !important; 
-            backdrop-filter: blur(12px); 
+            background: rgba(15, 23, 42, 0.85) !important; 
+            backdrop-filter: blur(15px); 
             border: 1px solid rgba(255,255,255,0.1) !important; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
         }
 
         #timer-display {
@@ -47,6 +66,17 @@
     </style>
 </head>
 <body>
+
+    <!-- FONDO ANIMADO CSS -->
+    <div class="bg-animated">
+        <div class="square sq-1"></div>
+        <div class="square sq-2"></div>
+        <div class="square sq-3"></div>
+        <div class="square sq-4"></div>
+        <div class="square sq-5"></div>
+        <div class="square sq-6"></div>
+        <div class="square sq-7"></div>
+    </div>
 
     <!-- Banner Megáfono -->
     <div id="announcement-banner" class="bg-info text-white text-center p-3 fw-bold fs-5">
@@ -63,9 +93,9 @@
 
     <div class="container mt-5" style="max-width: 650px;">
         
-        <!-- Contenedor del Reloj -->
+        <!-- Contenedor del Reloj (Actualizado para el problema visual del cero) -->
         <div id="timer-container" class="mb-3 text-center" style="display: none;">
-            <div class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
+            <div id="timer-title" class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
             <div id="timer-display" class="text-danger">00:00</div>
         </div>
 
@@ -96,14 +126,14 @@
                 <!-- Tokens -->
                 <div class="row text-center mb-4 g-2">
                     <div class="col-6">
-                        <div class="p-2 bg-primary rounded text-white shadow-sm border border-primary">
+                        <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
                             <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase</small>
                             <span class="fs-4 fw-bold" id="display-access-token">---</span>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-ticket-detailed-fill me-1"></i> Pase Entrega</small>
+                        <div class="p-2 bg-warning rounded text-dark shadow-sm border border-warning">
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-ticket-detailed-fill me-1"></i> Código de Envío</small>
                             <span class="fs-4 fw-bold" id="display-upload-token">---</span>
                         </div>
                     </div>
@@ -153,7 +183,7 @@
                         </div>
                         <div class="input-group mb-2">
                             <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
-                            <input type="text" id="upload-token" class="form-control" placeholder="Pase de Entrega" style="text-transform: uppercase;">
+                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío" style="text-transform: uppercase;">
                         </div>
                         
                         <div class="input-group mt-3">
@@ -220,19 +250,39 @@
         </div>
     </div>
 
-    <!-- Modales Legales -->
-    <div class="modal fade" id="privacyModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-header"><h5 class="modal-title">Política de Privacidad</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body small text-muted"><p>No recopilamos información personal sensible. El sistema es efímero. Utilizamos Google AdSense para anuncios. Google usa cookies para personalizar publicidad. Todo archivo subido se borra al acabar la clase.</p></div></div></div></div>
-    <div class="modal fade" id="termsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-header"><h5 class="modal-title">Términos de Servicio</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body small text-muted"><p>Plataforma educativa gratuita. Prohibido subir malware o material protegido. El servicio se ofrece "tal cual" sin garantías de persistencia de archivos.</p></div></div></div></div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         let currentToken = "";
         let refreshInterval = null;
         let targetTimer = null;
-        let lastAnnouncementId = null;
         let maxFileSizeLimit = 0; 
         
+        let isFirstLoad = true;
+        let lastMaterialCount = 0;
+        let lastPollId = null;
+        let lastSnippet = "";
+        let lastAnnouncementId = null;
+        let blinkInterval = null;
+        const originalTitle = document.title;
+        
+        function triggerTabBlinking(msg) {
+            if (!document.hidden || blinkInterval) return;
+            let showMsg = true;
+            blinkInterval = setInterval(() => {
+                document.title = showMsg ? msg : originalTitle;
+                showMsg = !showMsg;
+            }, 1000);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && blinkInterval) {
+                clearInterval(blinkInterval);
+                blinkInterval = null;
+                document.title = originalTitle;
+            }
+        });
+
         async function login() {
             const token = document.getElementById("token-input").value.trim().toUpperCase();
             if (!token) return alert("Por favor ingresa un token.");
@@ -269,14 +319,22 @@
                 document.getElementById("display-access-token").innerText = currentToken;
                 document.getElementById("display-upload-token").innerText = (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
+                let shouldBlink = false;
+                let blinkMessage = "🔴 ¡NUEVO AVISO!";
+
                 if (data.announcement && data.announcement.id !== lastAnnouncementId) {
                     lastAnnouncementId = data.announcement.id;
                     document.getElementById('announcement-text').innerText = data.announcement.text;
                     document.getElementById('announcement-banner').style.display = 'block';
                     setTimeout(() => document.getElementById('announcement-banner').style.display = 'none', 15000);
+                    shouldBlink = true;
+                    blinkMessage = "📢 NUEVO MENSAJE";
                 }
 
-                targetTimer = data.timerEndTime;
+                if (data.timerEndTime !== targetTimer) {
+                    targetTimer = data.timerEndTime;
+                    if (targetTimer) { shouldBlink = true; blinkMessage = "⏱️ RELOJ INICIADO"; }
+                }
                 updateLocalTimer();
 
                 const lockOverlay = document.getElementById('lock-overlay');
@@ -289,12 +347,22 @@
                     lockOverlay.style.display = 'none';
                 }
 
+                if (data.snippet && data.snippet !== lastSnippet) {
+                    lastSnippet = data.snippet;
+                    shouldBlink = true; blinkMessage = "💻 NUEVO CÓDIGO";
+                }
                 if (data.snippet && data.snippet.trim() !== '') {
                     document.getElementById('snippet-container').style.display = 'block';
                     document.getElementById('snippet-display').innerText = data.snippet;
                 } else {
                     document.getElementById('snippet-container').style.display = 'none';
                 }
+
+                if (data.poll && data.poll.id !== lastPollId) {
+                    lastPollId = data.poll.id;
+                    shouldBlink = true; blinkMessage = "📊 NUEVA ENCUESTA";
+                }
+                if (!data.poll) lastPollId = null;
 
                 if (data.poll) {
                     document.getElementById('poll-container').style.display = 'block';
@@ -328,6 +396,11 @@
                 maxFileSizeLimit = data.maxFileSize || 0;
                 document.getElementById('upload-limit-text').innerHTML = maxFileSizeLimit > 0 ? `<i class="bi bi-info-circle me-1"></i> Límite por archivo: ${maxFileSizeLimit} MB` : `<i class="bi bi-info-circle me-1"></i> Sin límite de tamaño`;
 
+                if (data.materials.length > lastMaterialCount) {
+                    shouldBlink = true; blinkMessage = "📚 NUEVO MATERIAL";
+                }
+                lastMaterialCount = data.materials.length;
+
                 const list = document.getElementById("materials-list");
                 if (data.materials.length === 0) list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">Ningún material.</li>";
                 else {
@@ -346,6 +419,9 @@
                     lastFive.forEach(s => subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary"><i class="bi bi-file-earmark-check text-success me-2"></i> ${s.title}</li>`);
                 }
 
+                if (shouldBlink && !isFirstLoad) triggerTabBlinking(blinkMessage);
+                isFirstLoad = false;
+
             } catch (e) {}
         }
 
@@ -360,17 +436,34 @@
         function updateLocalTimer() {
             const container = document.getElementById('timer-container');
             const display = document.getElementById('timer-display');
-            if (!targetTimer) return container.style.display = 'none';
+            const title = document.getElementById('timer-title');
+            
+            if (!targetTimer) {
+                container.style.display = 'none';
+                return;
+            }
             container.style.display = 'block';
             
             const now = Date.now();
-            let diff = Math.max(0, Math.floor((targetTimer - now) / 1000));
-            const m = Math.floor(diff / 60).toString().padStart(2, '0');
-            const s = (diff % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
+            let diff = Math.floor((targetTimer - now) / 1000);
             
-            if (diff > 0 && diff <= 60) display.style.animation = "blink 1s infinite";
-            else display.style.animation = "none";
+            if (diff <= 0) {
+                // Tiempo vencido
+                title.style.display = 'none';
+                display.innerText = "¡SE TERMINÓ EL TIEMPO!";
+                display.style.fontSize = "2.5rem";
+                display.style.animation = "none";
+            } else {
+                // Tiempo corriendo
+                title.style.display = 'inline-block';
+                display.style.fontSize = "3rem";
+                const m = Math.floor(diff / 60).toString().padStart(2, '0');
+                const s = (diff % 60).toString().padStart(2, '0');
+                display.innerText = `${m}:${s}`;
+                
+                if (diff <= 60) display.style.animation = "blink 1s infinite";
+                else display.style.animation = "none";
+            }
         }
         setInterval(updateLocalTimer, 1000);
 
