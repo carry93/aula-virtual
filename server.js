@@ -8,102 +8,174 @@ const archiver = require('archiver');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares para procesar JSON, formularios y servir la carpeta pública (frontend)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Carpeta temporal de subidas (se crea si no existe)
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR);
 }
 
-// Configuración de Multer: determina dónde y cómo guardar los archivos recibidos
+// Configuración de multer para las subidas de alumnos y materiales del profesor
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, UPLOAD_DIR);
-    },
-    filename: (req, file, cb) => {
-        // Prefijo con la fecha actual para evitar sobreescribir archivos con el mismo nombre
-        cb(null, Date.now() + '-' + file.originalname);
-    }
+    destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// ==========================================
-// ESTADO EN MEMORIA (Base de datos volátil)
-// ==========================================
-let activeTokens = []; // Tokens válidos generados por el profesor
-let materials = [];    // Lista de enlaces y archivos físicos
-let uploadTokens = []; // Tokens de un solo uso para que alumnos envíen trabajos
-let studentSubmissions = []; // Lista de trabajos recibidos
+// BASE DE DATOS EFÍMERA (En Memoria)
+let activeTokens = [];
+let uploadTokens = [];
+let materials = [];
+let studentSubmissions = [];
 
-// ==========================================
+// NUEVAS VARIABLES DE ESTADO (Para controles avanzados)
+let submissionsLocked = false;
+let timerEndTime = null;
+let latestAnnouncement = null;
+let studentQuestions = [];
+
 // MIDDLEWARE DE SEGURIDAD
-// ==========================================
 const requireToken = (req, res, next) => {
-    // Busca el token en los headers (petición fetch) o en la query string (descarga de archivo)
     const token = req.headers['authorization'] || req.query.token;
-    
     if (token && activeTokens.includes(token)) {
-        return next(); // El token es válido, continúa con la petición
+        return next();
     }
-    res.status(403).json({ error: 'Acceso denegado. Token inválido o la clase ya fue cerrada.' });
+    return res.status(403).json({ error: 'Token inválido o expirado.' });
 };
 
 // ==========================================
-// RUTAS DEL PROFESOR (Panel de Administración)
+// RUTAS DEL ESTUDIANTE
 // ==========================================
 
-// 1. Generar un nuevo token para una clase
+// 1. Ingresar a la clase
+app.post('/api/student/login', (req, res) => {
+    const { token } = req.body;
+    if (activeTokens.includes(token)) {
+        res.json({ success: true, token });
+    } else {
+        res.status(401).json({ error: 'Token incorrecto o clase no iniciada.' });
+    }
+});
+
+// 2. Obtener los datos en vivo de la clase
+app.get('/api/student/materials', requireToken, (req, res) => {
+    const safeMaterials = materials.map(m => {
+        if (m.type === 'file') return { id: m.id, type: m.type, title: m.title }; 
+        return m;
+    });
+    
+    const safeSubmissions = studentSubmissions.map(s => ({ title: s.title }));
+
+    res.json({
+        materials: safeMaterials,
+        activeTokens: activeTokens,
+        uploadTokens: uploadTokens,
+        submissions: safeSubmissions,
+        locked: submissionsLocked,
+        timerEndTime: timerEndTime,
+        announcement: latestAnnouncement,
+        questions: studentQuestions
+    });
+});
+
+// 3. Descargar archivo
+app.get('/api/download/:id', requireToken, (req, res) => {
+    const material = materials.find(m => m.id === req.params.id && m.type === 'file');
+    if (material && fs.existsSync(material.path)) {
+        res.download(material.path, material.title);
+    } else {
+        res.status(404).send('Archivo no encontrado. Tal vez el profesor cerró la clase.');
+    }
+});
+
+// 4. Subir un trabajo de estudiante
+app.post('/api/student/upload', upload.single('file'), (req, res) => {
+    // Verificamos si hay bloqueo o el tiempo se acabó
+    if (submissionsLocked) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ error: 'Las entregas están pausadas por el profesor.' });
+    }
+    if (timerEndTime && Date.now() > timerEndTime) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ error: '¡El tiempo de entrega se ha agotado!' });
+    }
+
+    const { uploadToken, studentName, studentGrade } = req.body;
+    if (!uploadToken || !uploadTokens.includes(uploadToken)) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ error: 'Token de entrega inválido o clase inactiva.' });
+    }
+    if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
+
+    const safeName = (studentName || 'SinNombre').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const safeGrade = (studentGrade || 'SinGrado').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const extension = path.extname(req.file.originalname) || '';
+    
+    const finalTitle = `${safeGrade}_${safeName}${extension}`;
+
+    const submission = {
+        id: Date.now().toString(),
+        title: finalTitle,
+        name: studentName,
+        grade: studentGrade,
+        path: req.file.path,
+        filename: req.file.filename,
+        tokenUsed: uploadToken,
+        size: req.file.size
+    };
+    
+    studentSubmissions.push(submission);
+    res.json({ success: true, fileId: submission.id });
+});
+
+// 5. Enviar una pregunta (Duda)
+app.post('/api/student/question', requireToken, (req, res) => {
+    const { name, text } = req.body;
+    if (!text || text.trim() === '') return res.status(400).json({ error: 'Pregunta vacía' });
+    const q = {
+        id: Date.now().toString(),
+        name: (name || 'Anónimo').trim().substring(0, 30),
+        text: text.trim().substring(0, 200),
+        time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+    };
+    studentQuestions.push(q);
+    res.json({ success: true });
+});
+
+// ==========================================
+// RUTAS DEL ADMINISTRADOR (Profesor)
+// ==========================================
+
 app.post('/api/admin/token', (req, res) => {
-    // Genera un token aleatorio de 6 caracteres hexadecimales (ej. 4F2A1B)
     const newToken = crypto.randomBytes(3).toString('hex').toUpperCase();
     activeTokens.push(newToken);
     res.json({ token: newToken, activeTokens });
 });
 
-// 2. Subir un enlace de texto
-app.post('/api/admin/material/link', (req, res) => {
-    const { title, url } = req.body;
-    if (!title || !url) return res.status(400).json({ error: 'Faltan datos' });
-
-    const material = {
-        id: Date.now().toString(),
-        type: 'link',
-        title,
-        url
-    };
-    materials.push(material);
-    res.json({ message: 'Enlace agregado con éxito', material });
-});
-
-// 3. Subir un archivo físico
-app.post('/api/admin/material/file', upload.single('file'), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
-
-    const material = {
-        id: Date.now().toString(),
-        type: 'file',
-        title: req.file.originalname,
-        path: req.file.path, // Ruta física en el disco (necesaria para la descarga)
-        filename: req.file.filename,
-        size: req.file.size
-    };
-    materials.push(material);
-    res.json({ message: 'Archivo subido con éxito', material });
-});
-
-// Generar token para permitir que un estudiante envíe un archivo
 app.post('/api/admin/upload-token', (req, res) => {
-    // Genera un token aleatorio de 6 caracteres hexadecimales al igual que la clave de acceso
     const newToken = crypto.randomBytes(3).toString('hex').toUpperCase();
     uploadTokens.push(newToken);
     res.json({ token: newToken, uploadTokens });
 });
 
-// Descargar un trabajo recibido de un estudiante
+app.post('/api/admin/material', upload.single('file'), (req, res) => {
+    const { type, title, url } = req.body;
+    const material = { id: Date.now().toString(), type, title };
+    if (type === 'link') {
+        material.url = url;
+    } else if (type === 'file' && req.file) {
+        material.path = req.file.path;
+        material.filename = req.file.filename;
+        material.size = req.file.size;
+    } else {
+        return res.status(400).json({ error: 'Datos inválidos' });
+    }
+    materials.push(material);
+    res.json({ success: true, material });
+});
+
 app.get('/api/admin/download-submission/:id', (req, res) => {
     const submission = studentSubmissions.find(s => s.id === req.params.id);
     if (submission && fs.existsSync(submission.path)) {
@@ -113,8 +185,7 @@ app.get('/api/admin/download-submission/:id', (req, res) => {
     }
 });
 
-// Eliminar trabajos seleccionados
-app.post('/api/admin/delete-submissions', express.json(), (req, res) => {
+app.post('/api/admin/delete-submissions', (req, res) => {
     const { ids } = req.body;
     if (!ids || !Array.isArray(ids)) return res.status(400).json({ error: 'Datos inválidos' });
     
@@ -129,7 +200,7 @@ app.post('/api/admin/delete-submissions', express.json(), (req, res) => {
     res.json({ success: true });
 });
 
-// Descargar todos los trabajos en un archivo ZIP
+// Descargar ZIP + Excel (CSV)
 app.get('/api/admin/download-zip', (req, res) => {
     const { colegio, grado } = req.query;
     const safeColegio = (colegio || 'Colegio').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
@@ -143,143 +214,98 @@ app.get('/api/admin/download-zip', (req, res) => {
     archive.pipe(res);
     
     let hasFiles = false;
+    let csvContent = '\uFEFFAlumno,Grado,Archivo,Fecha,Hora\n'; // \uFEFF para que Excel lea los tildes (BOM UTF-8)
+
     studentSubmissions.forEach(sub => {
         if (fs.existsSync(sub.path)) {
             hasFiles = true;
             archive.file(sub.path, { name: sub.title });
+            
+            // Construir línea del Excel
+            const dateObj = new Date(parseInt(sub.id));
+            const dateStr = dateObj.toLocaleDateString('es-ES');
+            const timeStr = dateObj.toLocaleTimeString('es-ES');
+            const sName = (sub.name || 'Desconocido').replace(/"/g, '""');
+            const sGrade = (sub.grade || 'Desconocido').replace(/"/g, '""');
+            const sTitle = (sub.title || '').replace(/"/g, '""');
+            
+            csvContent += `"${sName}","${sGrade}","${sTitle}","${dateStr}","${timeStr}"\n`;
         }
     });
     
-    if (!hasFiles) {
-        archive.append('No se encontraron trabajos o los archivos fueron borrados.', { name: 'info.txt' });
+    if (hasFiles) {
+        archive.append(csvContent, { name: 'Reporte_Entregas.csv' });
+    } else {
+        archive.append('No se encontraron trabajos.', { name: 'info.txt' });
     }
     
     archive.finalize();
 });
 
-// 4. Obtener el estado actual (para refrescar el panel del profesor)
+// Controles de Clase (Megáfono, Pausa, Reloj)
+app.post('/api/admin/toggle-lock', (req, res) => {
+    submissionsLocked = !submissionsLocked;
+    res.json({ success: true, locked: submissionsLocked });
+});
+
+app.post('/api/admin/timer', (req, res) => {
+    const { minutes } = req.body;
+    if (!minutes || minutes <= 0) {
+        timerEndTime = null;
+    } else {
+        timerEndTime = Date.now() + (minutes * 60000);
+    }
+    res.json({ success: true, timerEndTime });
+});
+
+app.post('/api/admin/announce', (req, res) => {
+    const { message } = req.body;
+    if (message) {
+        latestAnnouncement = { id: Date.now(), text: message };
+    }
+    res.json({ success: true });
+});
+
+app.post('/api/admin/delete-question', (req, res) => {
+    const { id } = req.body;
+    studentQuestions = studentQuestions.filter(q => q.id !== id);
+    res.json({ success: true });
+});
+
 app.get('/api/admin/status', (req, res) => {
     let totalBytes = 0;
     materials.forEach(m => { if (m.size) totalBytes += m.size; });
     studentSubmissions.forEach(s => { if (s.size) totalBytes += s.size; });
     
-    res.json({ activeTokens, materials, uploadTokens, studentSubmissions, totalBytes });
+    res.json({ 
+        activeTokens, materials, uploadTokens, studentSubmissions, totalBytes,
+        locked: submissionsLocked, timerEndTime, announcement: latestAnnouncement, questions: studentQuestions
+    });
 });
 
-// 5. CERRAR CLASE (CRÍTICO): Borra memoria y destruye archivos físicos
 app.post('/api/admin/close', (req, res) => {
-    // Vaciar variables de la memoria del servidor
-    activeTokens = [];
-    materials = [];
-    uploadTokens = [];
-    studentSubmissions = [];
-
-    // Eliminar los archivos físicamente de la carpeta "uploads"
-    fs.readdir(UPLOAD_DIR, (err, files) => {
-        if (err) {
-            console.error("Error al leer directorio de uploads", err);
-            return res.status(500).json({ error: 'Error interno al leer directorio' });
-        }
-
-        for (const file of files) {
-            // Se usa fs.unlink para eliminar cada archivo iterado
-            fs.unlink(path.join(UPLOAD_DIR, file), err => {
-                if (err) console.error("Error al eliminar el archivo físico:", err);
-            });
-        }
-    });
-
-    res.json({ message: 'Clase cerrada exitosamente. Toda la información fue destruida.' });
-});
-
-// ==========================================
-// RUTAS DEL ESTUDIANTE
-// ==========================================
-
-// 1. Validar el token ingresado por el alumno
-app.post('/api/student/login', (req, res) => {
-    const { token } = req.body;
-    if (activeTokens.includes(token)) {
-        res.json({ message: 'Token válido, ingresando...', token });
-    } else {
-        res.status(403).json({ error: 'Token inválido o clase inactiva.' });
-    }
-});
-
-// 2. Obtener los materiales de la clase (Protegido por requireToken)
-app.get('/api/student/materials', requireToken, (req, res) => {
-    // Mapeamos los materiales para no enviar las rutas físicas absolutas del disco al frontend
-    const safeMaterials = materials.map(m => {
-        if (m.type === 'file') {
-            return { id: m.id, type: m.type, title: m.title }; 
-        }
-        return m; // Enlaces se envían completos
-    });
-    
-    // Mapeamos los trabajos para enviar solo el título y no las rutas de los otros alumnos
-    const safeSubmissions = studentSubmissions.map(s => ({ title: s.title }));
-
-    res.json({
-        materials: safeMaterials,
-        activeTokens: activeTokens,
-        uploadTokens: uploadTokens,
-        submissions: safeSubmissions
-    });
-});
-
-// 3. Descargar archivo (Protegido por requireToken pasado por Query String)
-app.get('/api/download/:id', requireToken, (req, res) => {
-    const material = materials.find(m => m.id === req.params.id && m.type === 'file');
-
-    // Validamos que el material exista en nuestro registro y el archivo no haya sido borrado del disco
-    if (material && fs.existsSync(material.path)) {
-        res.download(material.path, material.title);
-    } else {
-        res.status(404).send('Archivo no encontrado. Tal vez el profesor cerró la clase.');
-    }
-});
-
-// 4. Subir un trabajo de estudiante (Protegido por token de entrega)
-app.post('/api/student/upload', upload.single('file'), (req, res) => {
-    const { uploadToken, studentName, studentGrade } = req.body;
-    
-    // Verificar que el token exista y sea válido
-    if (!uploadToken || !uploadTokens.includes(uploadToken)) {
-        // Borrar el archivo si el token es inválido
-        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        return res.status(403).json({ error: 'Token de entrega inválido o clase inactiva.' });
-    }
-    
-    if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
-
-    // Limpiar y formatear el nombre y grado para evitar caracteres extraños en el archivo
-    const safeName = (studentName || 'SinNombre').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
-    const safeGrade = (studentGrade || 'SinGrado').replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
-    const extension = path.extname(req.file.originalname) || '';
-    
-    // El título con el que verá y descargará el profesor el archivo
-    const finalTitle = `${safeGrade}_${safeName}${extension}`;
-
-    const submission = {
-        id: Date.now().toString(),
-        title: finalTitle,
-        path: req.file.path,
-        filename: req.file.filename,
-        tokenUsed: uploadToken,
-        size: req.file.size
+    const deleteFiles = (arr) => {
+        arr.forEach(item => {
+            if (item.path && fs.existsSync(item.path)) {
+                try { fs.unlinkSync(item.path); } catch (e) { console.error('Error al borrar', e); }
+            }
+        });
     };
-    
-    studentSubmissions.push(submission);
-    
-    // Ya no se elimina el token para que pueda usarse múltiples veces
-    // uploadTokens = uploadTokens.filter(t => t !== uploadToken);
+    deleteFiles(materials);
+    deleteFiles(studentSubmissions);
 
-    res.json({ message: 'Trabajo enviado con éxito', submission });
+    activeTokens = [];
+    uploadTokens = [];
+    materials = [];
+    studentSubmissions = [];
+    submissionsLocked = false;
+    timerEndTime = null;
+    latestAnnouncement = null;
+    studentQuestions = [];
+
+    res.json({ success: true });
 });
 
-// Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor de Aula Virtual corriendo en: http://localhost:${PORT}`);
-    console.log(`👨‍🎓 Estudiantes: http://localhost:${PORT}/index.html`);
-    console.log(`👨‍🏫 Profesor:  http://localhost:${PORT}/admin.html`);
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });
