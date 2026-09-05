@@ -1,148 +1,70 @@
 <!DOCTYPE html>
 <html lang="es" data-bs-theme="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Aula Virtual compuclase.click - Plataforma educativa interactiva gratuita para estudiantes y docentes. Envío de tareas, descarga de materiales, y gestión de clases en tiempo real.">
-    <meta name="keywords"
-        content="aula virtual, educación a distancia, colegio, profesores, estudiantes, clases virtuales, tareas, plataforma educativa, herramientas digitales">
+    <meta name="description" content="Aula Virtual compuclase.click - Plataforma educativa interactiva gratuita para estudiantes y docentes. Envío de tareas, descarga de materiales, y gestión de clases en tiempo real.">
+    <meta name="keywords" content="aula virtual, educación a distancia, colegio, profesores, estudiantes, clases virtuales, tareas, plataforma educativa, herramientas digitales">
     <title>Aula Virtual - Estudiante</title>
-
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452"
-        crossorigin="anonymous"></script>
-
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452" crossorigin="anonymous"></script>
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+        body { 
+            margin: 0; padding: 0; overflow-x: hidden;
             color: #f8f9fa;
         }
-
+        
         /* EFECTO VISUAL ANIMADO (CUBOS FLOTANTES Y FONDO INTENSO) */
         .bg-animated {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            background: #0f172a;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: #0f172a; 
             overflow: hidden;
         }
-
         .bg-animated .square {
-            position: absolute;
-            bottom: -120px;
-            background: rgba(56, 189, 248, 0.05);
+            position: absolute; bottom: -120px;
+            background: rgba(56, 189, 248, 0.05); 
             border: 2px solid rgba(56, 189, 248, 0.2);
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
             animation: floatUp linear infinite;
         }
-
-        .sq-1 {
-            left: 10%;
-            width: 80px;
-            height: 80px;
-            animation-duration: 15s;
-        }
-
-        .sq-2 {
-            left: 30%;
-            width: 50px;
-            height: 50px;
-            animation-duration: 12s;
-            animation-delay: 2s;
-        }
-
-        .sq-3 {
-            left: 60%;
-            width: 120px;
-            height: 120px;
-            animation-duration: 22s;
-        }
-
-        .sq-4 {
-            left: 85%;
-            width: 60px;
-            height: 60px;
-            animation-duration: 14s;
-            animation-delay: 5s;
-        }
-
-        .sq-5 {
-            left: 45%;
-            width: 40px;
-            height: 40px;
-            animation-duration: 10s;
-            animation-delay: 1s;
-        }
-
-        .sq-6 {
-            left: 75%;
-            width: 90px;
-            height: 90px;
-            animation-duration: 18s;
-            animation-delay: 7s;
-        }
-
-        .sq-7 {
-            left: 20%;
-            width: 70px;
-            height: 70px;
-            animation-duration: 16s;
-            animation-delay: 4s;
-        }
-
+        .sq-1 { left: 10%; width: 80px; height: 80px; animation-duration: 15s; }
+        .sq-2 { left: 30%; width: 50px; height: 50px; animation-duration: 12s; animation-delay: 2s; }
+        .sq-3 { left: 60%; width: 120px; height: 120px; animation-duration: 22s; }
+        .sq-4 { left: 85%; width: 60px; height: 60px; animation-duration: 14s; animation-delay: 5s; }
+        .sq-5 { left: 45%; width: 40px; height: 40px; animation-duration: 10s; animation-delay: 1s; }
+        .sq-6 { left: 75%; width: 90px; height: 90px; animation-duration: 18s; animation-delay: 7s; }
+        .sq-7 { left: 20%; width: 70px; height: 70px; animation-duration: 16s; animation-delay: 4s; }
+        
         @keyframes floatUp {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-120vh) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
-        .card {
-            background: rgba(15, 23, 42, 0.85) !important;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        .card { 
+            background: rgba(15, 23, 42, 0.85) !important; 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
         }
 
         #timer-display {
-            font-size: 3rem;
-            font-weight: 900;
-            font-variant-numeric: tabular-nums;
-            text-shadow: 0 0 15px rgba(220, 53, 69, 0.9);
-            letter-spacing: 2px;
+            font-size: 3rem; font-weight: 900; font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 15px rgba(220, 53, 69, 0.9); letter-spacing: 2px;
         }
-
         #announcement-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1050;
-            display: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1050; display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
     </style>
 </head>
-
 <body>
 
     <!-- FONDO ANIMADO CSS -->
@@ -159,24 +81,21 @@
     <!-- Banner Megáfono -->
     <div id="announcement-banner" class="bg-info text-white text-center p-3 fw-bold fs-5">
         <i class="bi bi-megaphone-fill me-2"></i> <span id="announcement-text"></span>
-        <button type="button" class="btn-close btn-close-white float-end"
-            onclick="document.getElementById('announcement-banner').style.display='none'"></button>
+        <button type="button" class="btn-close btn-close-white float-end" onclick="document.getElementById('announcement-banner').style.display='none'"></button>
     </div>
 
     <!-- Botón Duda -->
-    <button id="btn-duda"
-        class="btn btn-info btn-lg rounded-circle shadow-lg text-white d-flex justify-content-center align-items-center"
-        style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 28px;"
-        data-bs-toggle="modal" data-bs-target="#questionModal" title="Tengo una duda">
+    <button id="btn-duda" class="btn btn-info btn-lg rounded-circle shadow-lg text-white d-flex justify-content-center align-items-center" 
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 28px;" 
+            data-bs-toggle="modal" data-bs-target="#questionModal" title="Tengo una duda">
         <i class="bi bi-person-raised-hand"></i>
     </button>
 
     <div class="container mt-5" style="max-width: 650px;">
-
-        <!-- Contenedor del Reloj (Actualizado para el problema visual del cero) -->
+        
+        <!-- Contenedor del Reloj -->
         <div id="timer-container" class="mb-3 text-center" style="display: none;">
-            <div id="timer-title" class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo
-                restante</div>
+            <div id="timer-title" class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
             <div id="timer-display" class="text-danger">00:00</div>
         </div>
 
@@ -194,32 +113,27 @@
                     </ol>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text bg-dark border-secondary text-primary"><i
-                            class="bi bi-key-fill"></i></span>
-                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold"
-                        placeholder="Clave de 6 Digitos" style="text-transform: uppercase;">
+                    <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-key-fill"></i></span>
+                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold" placeholder="Clave de 6 letras" style="text-transform: uppercase;">
                 </div>
-                <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="login()"><i
-                        class="bi bi-box-arrow-in-right me-2"></i> Ingresar a Clase</button>
+                <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="login()"><i class="bi bi-box-arrow-in-right me-2"></i> Ingresar a Clase</button>
                 <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
             </div>
 
             <!-- SECCIÓN LOGUEADO -->
             <div id="materials-section" style="display: none;">
-
+                
                 <!-- Tokens -->
                 <div class="row text-center mb-4 g-2">
                     <div class="col-6">
                         <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i
-                                    class="bi bi-key-fill me-1"></i> Clave Clase</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase</small>
                             <span class="fs-4 fw-bold" id="display-access-token">---</span>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2 bg-warning rounded text-dark shadow-sm border border-warning">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i
-                                    class="bi bi-ticket-detailed-fill me-1"></i> Código de Envío</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-ticket-detailed-fill me-1"></i> Código de Envío</small>
                             <span class="fs-4 fw-bold" id="display-upload-token">---</span>
                         </div>
                     </div>
@@ -227,25 +141,21 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 border-secondary">
                     <h4 class="mb-0 text-primary"><i class="bi bi-journal-text me-2"></i>Contenido de Clase</h4>
-                    <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i
-                            class="bi bi-box-arrow-left me-1"></i> Salir</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-box-arrow-left me-1"></i> Salir</button>
                 </div>
 
                 <!-- ENCUESTA EN VIVO -->
-                <div id="poll-container" class="alert alert-warning text-start mb-4 border-warning shadow"
-                    style="display: none;">
-                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-bar-chart-steps me-2"></i> <span
-                            id="poll-question"></span></h5>
+                <div id="poll-container" class="alert alert-warning text-start mb-4 border-warning shadow" style="display: none;">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-bar-chart-steps me-2"></i> <span id="poll-question"></span></h5>
                     <div id="poll-options" class="d-grid gap-2"></div>
                 </div>
-
+                
                 <!-- PIZARRA DE CÓDIGO -->
                 <div id="snippet-container" class="text-start mb-4 shadow" style="display: none;">
                     <h5 class="text-secondary mb-2"><i class="bi bi-terminal me-2"></i> Pizarra del Profesor</h5>
-                    <pre class="bg-dark text-success p-3 rounded border border-secondary"
-                        style="white-space: pre-wrap; font-family: monospace;"><code id="snippet-display"></code></pre>
+                    <pre class="bg-dark text-success p-3 rounded border border-secondary" style="white-space: pre-wrap; font-family: monospace;"><code id="snippet-display"></code></pre>
                 </div>
-
+                
                 <!-- MATERIALES -->
                 <div class="text-start mb-4">
                     <h5 class="text-secondary mb-2"><i class="bi bi-folder-fill me-2"></i> Archivos y Enlaces</h5>
@@ -254,112 +164,87 @@
 
                 <!-- ENVIAR TRABAJO -->
                 <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative shadow">
-
-                    <div id="lock-overlay"
-                        style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);"
-                        class="d-flex flex-column justify-content-center align-items-center text-center p-4">
+                    
+                    <div id="lock-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);" class="d-flex flex-column justify-content-center align-items-center text-center p-4">
                         <i class="bi bi-lock-fill text-danger mb-2" style="font-size: 4rem;"></i>
                         <h4 class="text-danger fw-bold">ENTREGAS PAUSADAS</h4>
-                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío
-                            momentáneamente.</p>
+                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío momentáneamente.</p>
                     </div>
 
                     <h5 class="text-secondary mb-3"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
                     <div class="mb-2">
                         <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i
-                                    class="bi bi-person-fill text-secondary"></i></span>
-                            <input type="text" id="student-name" class="form-control"
-                                placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
+                            <input type="text" id="student-name" class="form-control" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
                         </div>
                         <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i
-                                    class="bi bi-mortarboard-fill text-secondary"></i></span>
-                            <input type="text" id="student-grade" class="form-control"
-                                placeholder="Tu Grado (Ej. 5to Secundaria)">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-mortarboard-fill text-secondary"></i></span>
+                            <input type="text" id="student-grade" class="form-control" placeholder="Tu Grado (Ej. 5to Secundaria)">
                         </div>
                         <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i
-                                    class="bi bi-ticket-detailed text-secondary"></i></span>
-                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío"
-                                style="text-transform: uppercase;">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
+                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío" style="text-transform: uppercase;">
                         </div>
-
+                        
                         <div class="input-group mt-3">
                             <input type="file" id="upload-file" class="form-control">
                         </div>
-                        <small class="text-muted" id="upload-limit-text"><i class="bi bi-info-circle me-1"></i> Límite
-                            por archivo: -- MB</small>
+                        <small class="text-muted" id="upload-limit-text"><i class="bi bi-info-circle me-1"></i> Límite por archivo: -- MB</small>
                     </div>
-                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit"
-                        onclick="submitWork()"><i class="bi bi-send-fill me-1"></i> Enviar Trabajo</button>
+                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()"><i class="bi bi-send-fill me-1"></i> Enviar Trabajo</button>
                     <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
                 </div>
 
                 <!-- Trabajos Recibidos -->
                 <div class="text-start p-3 mt-4">
-                    <h6 class="text-secondary mb-2 text-center"><i class="bi bi-check2-all me-1"></i> Entregas Recientes
-                    </h6>
-                    <ul id="student-submissions-list"
-                        class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
+                    <h6 class="text-secondary mb-2 text-center"><i class="bi bi-check2-all me-1"></i> Entregas Recientes</h6>
+                    <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
                 </div>
             </div>
         </div>
 
         <!-- SEO TEXT BLOQUE -->
         <div class="card shadow-sm p-4 mb-4 text-start bg-body-tertiary border-0">
-            <h5 class="text-secondary fs-6 text-uppercase mb-3 fw-bold"><i class="bi bi-info-circle-fill me-2"></i>
-                Sobre Nuestra Plataforma Educativa</h5>
+            <h5 class="text-secondary fs-6 text-uppercase mb-3 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Sobre Nuestra Plataforma Educativa</h5>
             <p class="small text-muted mb-2">
-                <strong>compuclase.click</strong> es un Aula Virtual interactiva y gratuita diseñada para modernizar la
-                forma en que los docentes imparten sus clases y cómo los estudiantes entregan sus tareas.
+                <strong>compuclase.click</strong> es un Aula Virtual interactiva y gratuita diseñada para modernizar la forma en que los docentes imparten sus clases y cómo los estudiantes entregan sus tareas.
             </p>
             <p class="small text-muted mb-2">
-                Nuestra plataforma educativa se enfoca en la privacidad y la inmediatez. No requiere registros molestos;
-                funciona con un sistema de tokens de un solo uso que garantizan una conexión directa y en tiempo real.
+                Nuestra plataforma educativa se enfoca en la privacidad y la inmediatez. No requiere registros molestos; funciona con un sistema de tokens de un solo uso que garantizan una conexión directa y en tiempo real. 
             </p>
             <p class="small text-muted mb-0">
-                Los profesores pueden lanzar encuestas, compartir fragmentos de código, proyectar relojes en vivo y
-                recibir documentos que luego se descargan cómodamente ordenados. Además, por seguridad, todo archivo
-                compartido se destruye permanentemente de nuestros servidores al finalizar la sesión de estudio.
+                Los profesores pueden lanzar encuestas, compartir fragmentos de código, proyectar relojes en vivo y recibir documentos que luego se descargan cómodamente ordenados. Además, por seguridad, todo archivo compartido se destruye permanentemente de nuestros servidores al finalizar la sesión de estudio.
             </p>
         </div>
 
         <footer class="mt-2 mb-3 text-center text-muted small">
             <div class="mb-2 d-flex justify-content-center gap-3">
-                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal"
-                    class="text-decoration-none text-muted">Privacidad</a>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted">Privacidad</a>
                 <span class="text-muted">|</span>
-                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal"
-                    class="text-decoration-none text-muted">Términos</a>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
             </div>
-            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank"
-                class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
         </footer>
     </div>
-
+    
     <!-- Modal Dudas -->
     <div class="modal fade" id="questionModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-body-tertiary">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title text-info"><i class="bi bi-chat-square-text-fill me-2"></i> Enviar una duda
-                        al profesor</h5>
+                    <h5 class="modal-title text-info"><i class="bi bi-chat-square-text-fill me-2"></i> Enviar una duda al profesor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="input-group mb-3">
-                        <span class="input-group-text bg-dark border-secondary"><i
-                                class="bi bi-person-fill text-secondary"></i></span>
+                        <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
                         <input type="text" id="q-name" class="form-control" placeholder="Tu Nombre (Opcional)">
                     </div>
                     <textarea id="q-text" class="form-control" rows="3" placeholder="Escribe tu pregunta..."></textarea>
-                    <div id="q-msg" class="mt-2 text-success fw-bold text-center" style="display:none;"><i
-                            class="bi bi-check-circle-fill me-1"></i> ¡Pregunta enviada!</div>
+                    <div id="q-msg" class="mt-2 text-success fw-bold text-center" style="display:none;"><i class="bi bi-check-circle-fill me-1"></i> ¡Pregunta enviada!</div>
                 </div>
                 <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-info w-100 fw-bold text-white" onclick="submitQuestion()"><i
-                            class="bi bi-send-fill me-1"></i> Enviar Duda</button>
+                    <button type="button" class="btn btn-info w-100 fw-bold text-white" onclick="submitQuestion()"><i class="bi bi-send-fill me-1"></i> Enviar Duda</button>
                 </div>
             </div>
         </div>
@@ -370,9 +255,9 @@
     <script>
         let currentToken = "";
         let refreshInterval = null;
-        let targetTimer = null;
-        let maxFileSizeLimit = 0;
-
+        let localTimerRemaining = null; // EL MANEJO CORRECTO DEL RELOJ
+        let maxFileSizeLimit = 0; 
+        
         let isFirstLoad = true;
         let lastMaterialCount = 0;
         let lastPollId = null;
@@ -380,7 +265,7 @@
         let lastAnnouncementId = null;
         let blinkInterval = null;
         const originalTitle = document.title;
-
+        
         function triggerTabBlinking(msg) {
             if (!document.hidden || blinkInterval) return;
             let showMsg = true;
@@ -410,7 +295,7 @@
                     document.getElementById("materials-section").style.display = "block";
                     document.getElementById("btn-duda").style.display = "flex";
                     loadMaterials();
-                    refreshInterval = setInterval(loadMaterials, 5000);
+                    refreshInterval = setInterval(loadMaterials, 5000); 
                 } else {
                     document.getElementById("login-error").innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Token incorrecto o clase no iniciada.';
                     document.getElementById("login-error").style.display = "block";
@@ -420,17 +305,18 @@
 
         function logout() {
             currentToken = "";
-            if (refreshInterval) clearInterval(refreshInterval);
+            if(refreshInterval) clearInterval(refreshInterval);
             location.reload();
         }
 
         async function loadMaterials() {
             if (!currentToken) return;
             try {
-                const res = await fetch("/api/student/materials", { headers: { "Authorization": currentToken } });
+                // EVITAR CACHÉ DEL NAVEGADOR AGREGANDO DATE.NOW()
+                const res = await fetch(`/api/student/materials?_t=${Date.now()}`, { headers: { "Authorization": currentToken } });
                 if (res.status === 403) return logout();
                 const data = await res.json();
-
+                
                 document.getElementById("display-access-token").innerText = currentToken;
                 document.getElementById("display-upload-token").innerText = (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
@@ -446,18 +332,25 @@
                     blinkMessage = "📢 NUEVO MENSAJE";
                 }
 
-                if (data.timerEndTime !== targetTimer) {
-                    targetTimer = data.timerEndTime;
-                    if (targetTimer) { shouldBlink = true; blinkMessage = "⏱️ RELOJ INICIADO"; }
+                // Sincronización del tiempo local
+                if (data.timerRemaining !== undefined) {
+                    if (localTimerRemaining === null && data.timerRemaining !== null) {
+                        shouldBlink = true; blinkMessage = "⏱️ RELOJ INICIADO";
+                    }
+                    localTimerRemaining = data.timerRemaining;
+                } else {
+                    localTimerRemaining = null;
                 }
-                updateLocalTimer();
 
+                // LÓGICA DE BLOQUEO ACTUALIZADA
                 const lockOverlay = document.getElementById('lock-overlay');
                 const lockReason = document.getElementById('lock-reason');
                 if (data.locked) {
-                    lockOverlay.style.display = 'flex'; lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
-                } else if (targetTimer && Date.now() >= targetTimer) {
-                    lockOverlay.style.display = 'flex'; lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
+                    lockOverlay.style.display = 'flex'; 
+                    lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
+                } else if (localTimerRemaining !== null && localTimerRemaining <= 0) {
+                    lockOverlay.style.display = 'flex'; 
+                    lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
                 } else {
                     lockOverlay.style.display = 'none';
                 }
@@ -482,7 +375,7 @@
                 if (data.poll) {
                     document.getElementById('poll-container').style.display = 'block';
                     document.getElementById('poll-question').innerText = data.poll.question;
-
+                    
                     const hasVoted = localStorage.getItem('voted_' + data.poll.id);
                     const pollOps = document.getElementById('poll-options');
                     pollOps.innerHTML = '';
@@ -525,7 +418,7 @@
                         else list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${m.title}"><i class="bi bi-file-earmark-arrow-down fs-5 me-1 text-success"></i> ${m.title}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary" title="Descargar"><i class="bi bi-download"></i></a></li>`;
                     });
                 }
-
+                
                 const subList = document.getElementById("student-submissions-list");
                 if (!data.submissions || data.submissions.length === 0) subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Nadie ha entregado aún.</li>";
                 else {
@@ -537,7 +430,7 @@
                 if (shouldBlink && !isFirstLoad) triggerTabBlinking(blinkMessage);
                 isFirstLoad = false;
 
-            } catch (e) { }
+            } catch (e) {}
         }
 
         async function votePoll(pollId, index) {
@@ -552,34 +445,37 @@
             const container = document.getElementById('timer-container');
             const display = document.getElementById('timer-display');
             const title = document.getElementById('timer-title');
-
-            if (!targetTimer) {
+            
+            if (localTimerRemaining === null) {
                 container.style.display = 'none';
                 return;
             }
             container.style.display = 'block';
-
-            const now = Date.now();
-            let diff = Math.floor((targetTimer - now) / 1000);
-
-            if (diff <= 0) {
-                // Tiempo vencido
+            
+            if (localTimerRemaining <= 0) {
                 title.style.display = 'none';
                 display.innerText = "¡SE TERMINÓ EL TIEMPO!";
                 display.style.fontSize = "2.5rem";
                 display.style.animation = "none";
+                
+                // Aplicar el overlay visualmente también desde aquí
+                document.getElementById('lock-overlay').style.display = 'flex'; 
+                document.getElementById('lock-reason').innerText = "¡El tiempo para entregar se ha agotado!";
             } else {
-                // Tiempo corriendo
+                localTimerRemaining--; // Restamos localmente
+                
                 title.style.display = 'inline-block';
                 display.style.fontSize = "3rem";
-                const m = Math.floor(diff / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
+                const m = Math.floor(localTimerRemaining / 60).toString().padStart(2, '0');
+                const s = (localTimerRemaining % 60).toString().padStart(2, '0');
                 display.innerText = `${m}:${s}`;
-
-                if (diff <= 60) display.style.animation = "blink 1s infinite";
+                
+                if (localTimerRemaining <= 60) display.style.animation = "blink 1s infinite";
                 else display.style.animation = "none";
             }
         }
+        
+        // Llamar a la actualización local cada 1 segundo
         setInterval(updateLocalTimer, 1000);
 
         async function submitWork() {
@@ -588,7 +484,7 @@
             const grade = document.getElementById("student-grade").value.trim();
             const fileInput = document.getElementById("upload-file");
             const msgEl = document.getElementById("upload-message");
-
+            
             if (!name || !grade || !token || !fileInput.files.length) return alert("Llena todos los campos y selecciona un archivo.");
 
             if (maxFileSizeLimit > 0 && fileInput.files[0].size > maxFileSizeLimit * 1024 * 1024) {
@@ -603,15 +499,15 @@
 
             const btn = document.getElementById("btn-submit");
             btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Enviando...';
-
+            
             try {
                 const res = await fetch("/api/student/upload", { method: "POST", body: formData });
                 const data = await res.json();
                 msgEl.style.display = "block";
-
+                
                 if (res.ok) {
                     msgEl.className = "mt-2 text-center text-success fw-bold"; msgEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Trabajo enviado!';
-                    fileInput.value = ""; loadMaterials();
+                    fileInput.value = ""; loadMaterials(); 
                 } else {
                     msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> ${data.error || "Error al enviar."}`;
                 }
@@ -643,5 +539,4 @@
         document.head.appendChild(style);
     </script>
 </body>
-
 </html>

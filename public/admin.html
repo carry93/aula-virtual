@@ -277,7 +277,8 @@
 
         async function loadStatus() {
             try {
-                const res = await fetch('/api/admin/status');
+                // EVITAMOS CACHÉ DEL NAVEGADOR
+                const res = await fetch(`/api/admin/status?_t=${Date.now()}`);
                 const data = await res.json();
                 
                 renderTokens(data.activeTokens);
@@ -380,7 +381,10 @@
             loadStatus();
         }
 
-        async function toggleLock() { await fetch('/api/admin/toggle-lock', { method: 'POST' }); loadStatus(); }
+        async function toggleLock() { 
+            await fetch('/api/admin/toggle-lock', { method: 'POST' }); 
+            loadStatus(); 
+        }
         async function startTimer() {
             const mins = parseInt(document.getElementById('timer-minutes').value);
             if (!mins || mins <= 0) return alert('Ingresa un tiempo válido');
@@ -431,6 +435,7 @@
             if (materials.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>';
             list.innerHTML = materials.map(m => `<li class="list-group-item py-2 bg-transparent px-1 border-bottom"><div class="d-flex w-100 justify-content-between align-items-center"><h6 class="mb-0 text-truncate pe-2 small"><i class="bi ${m.type === 'link' ? 'bi-link-45deg text-primary' : 'bi-file-earmark-arrow-down text-success'} fs-5 me-1"></i> ${m.title}</h6><span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase" style="font-size:0.6rem;">${m.type}</span></div></li>`).join('');
         }
+        
         async function generateToken() { await fetch('/api/admin/token', { method: 'POST' }); loadStatus(); }
         async function generateUploadToken() { 
             const res = await fetch('/api/admin/upload-token', { method: 'POST' }); 
