@@ -65,7 +65,6 @@ const ADMIN_PASS = process.env.ADMIN_PASS || 'edu.25694050';
 let activeAdminSessions = new Set();
 
 // ESTADO DE LA CLASE
-let submissionsLocked = true; // EMPIEZA BLOQUEADO POR DEFECTO
 let timerEndTime = null;
 let latestAnnouncement = null;
 let studentQuestions = [];
@@ -127,11 +126,9 @@ app.get('/api/student/materials', requireStudentToken, (req, res) => {
         remaining = Math.max(0, Math.floor((timerEndTime - Date.now()) / 1000));
     }
 
-    // No se expone uploadTokens ni activeTokens para prevenir bypass de autorización
     res.json({
         materials: safeMaterials,
         submissions: safeSubmissions,
-        locked: submissionsLocked,
         timerRemaining: remaining,
         announcement: latestAnnouncement,
         questions: studentQuestions,
@@ -151,10 +148,6 @@ app.get('/api/download/:id', requireStudentToken, (req, res) => {
 });
 
 app.post('/api/student/upload', upload.single('file'), async (req, res) => {
-    if (submissionsLocked) {
-        if (req.file) await safeUnlink(req.file.path);
-        return res.status(403).json({ error: 'Las entregas están pausadas por el profesor.' });
-    }
     if (timerEndTime && Date.now() > timerEndTime) {
         if (req.file) await safeUnlink(req.file.path);
         return res.status(403).json({ error: '¡El tiempo de entrega se ha agotado!' });
@@ -248,11 +241,7 @@ app.post('/api/admin/token', (req, res) => {
 app.post('/api/admin/upload-token', (req, res) => {
     const newToken = crypto.randomBytes(3).toString('hex').toUpperCase();
     uploadTokens.push(newToken);
-    
-    // Al generar pase de entrega, habilitar automáticamente y limpiar timer
-    submissionsLocked = false;
     timerEndTime = null;
-
     res.json({ token: newToken });
 });
 
@@ -347,12 +336,6 @@ app.get('/api/admin/download-zip', (req, res) => {
     archive.finalize();
 });
 
-app.post('/api/admin/toggle-lock', (req, res) => {
-    submissionsLocked = !submissionsLocked;
-    if (!submissionsLocked) timerEndTime = null;
-    res.json({ success: true, locked: submissionsLocked });
-});
-
 app.post('/api/admin/timer', (req, res) => {
     const { minutes } = req.body;
     timerEndTime = (!minutes || minutes <= 0) ? null : Date.now() + (minutes * 60000);
@@ -395,7 +378,7 @@ app.get('/api/admin/status', (req, res) => {
     
     res.json({ 
         activeTokens, materials, uploadTokens, studentSubmissions, totalBytes,
-        locked: submissionsLocked, announcement: latestAnnouncement, 
+        announcement: latestAnnouncement, 
         questions: studentQuestions, snippet: liveSnippet, poll: currentPoll, maxFileSizeMB
     });
 });
@@ -406,7 +389,7 @@ app.post('/api/admin/close', async (req, res) => {
     }
 
     activeTokens = []; uploadTokens = []; materials = []; studentSubmissions = [];
-    submissionsLocked = true; timerEndTime = null; latestAnnouncement = null;
+    timerEndTime = null; latestAnnouncement = null;
     studentQuestions = []; liveSnippet = ""; currentPoll = null; lastStudentActivity = 0;
     res.json({ success: true });
 });
