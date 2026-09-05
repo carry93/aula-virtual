@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aula Virtual - Profesor</title>
-    <!-- Favicon 👨‍🏫 -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🏫</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
         body { background-color: #f8f9fa; }
         [data-bs-theme="dark"] body { background-color: #212529; }
-        .letter-spacing-1 { letter-spacing: 2px; }
         .border-dashed { border: 2px dashed #dee2e6; }
         [data-bs-theme="dark"] .border-dashed { border-color: #495057; }
         .password-container { position: relative; }
@@ -27,7 +29,8 @@
     <div class="container mt-5" id="login-screen" style="max-width: 400px;">
         <div class="card shadow-sm border-0 p-4 bg-body-tertiary">
             <div class="text-center mb-4">
-                <h3 class="text-primary fw-bold">Panel de Control</h3>
+                <i class="bi bi-person-badge-fill text-primary" style="font-size: 3rem;"></i>
+                <h3 class="text-primary fw-bold mt-2">Panel de Control</h3>
                 <p class="text-muted small">Acceso exclusivo para docentes</p>
             </div>
             <div class="mb-3">
@@ -35,9 +38,9 @@
             </div>
             <div class="mb-3 password-container">
                 <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña">
-                <button class="toggle-password" onclick="togglePassword()" id="btn-eye">👁️</button>
+                <button class="toggle-password" onclick="togglePassword()" id="btn-eye"><i class="bi bi-eye-fill"></i></button>
             </div>
-            <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()">Ingresar</button>
+            <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()"><i class="bi bi-box-arrow-in-right me-1"></i> Ingresar</button>
             <div id="admin-error" class="alert alert-danger mt-3 text-center small" style="display: none;">Credenciales incorrectas</div>
         </div>
     </div>
@@ -47,60 +50,69 @@
         
         <!-- Cabecera -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-body-tertiary p-3 rounded shadow-sm border-start border-primary border-5">
-            <h2 class="m-0 text-primary">Panel del Profesor</h2>
-            <button class="btn btn-danger fw-bold shadow" onclick="closeClass()">🛑 Finalizar Clase y Destruir Datos</button>
+            <h2 class="m-0 text-primary"><i class="bi bi-person-workspace me-2"></i>Panel del Profesor</h2>
+            <button class="btn btn-danger fw-bold shadow" onclick="closeClass()"><i class="bi bi-power me-1"></i> Finalizar Clase</button>
         </div>
 
         <div class="row">
             <!-- PANEL IZQUIERDO -->
             <div class="col-lg-4 col-md-5">
                 
-                <!-- MEDIDOR DE ALMACENAMIENTO -->
+                <!-- MEDIDOR DE ALMACENAMIENTO Y LÍMITE -->
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-body py-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <h6 class="mb-0 text-secondary small">💽 Almacenamiento (Máx 250MB)</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 text-secondary small"><i class="bi bi-hdd-fill me-1"></i> Almacenamiento (Máx 250MB)</h6>
                             <span id="storage-text" class="fw-bold text-success small">0 MB</span>
                         </div>
-                        <div class="progress" style="height: 8px;">
+                        <div class="progress mb-3" style="height: 8px;">
                             <div id="storage-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
                         </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted fw-bold"><i class="bi bi-shield-lock-fill me-1"></i> Límite por Archivo:</span>
+                            <select id="file-limit-select" class="form-select form-select-sm w-auto" onchange="setLimit()">
+                                <option value="2">Máx 2 MB</option>
+                                <option value="5">Máx 5 MB</option>
+                                <option value="10" selected>Máx 10 MB</option>
+                                <option value="50">Máx 50 MB</option>
+                                <option value="0">Ilimitado</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- CONTROLES EN VIVO (Megáfono, Reloj, Pausa) -->
+                <!-- CONTROLES EN VIVO -->
                 <div class="card shadow-sm border-0 mb-4 border-start border-warning border-4">
                     <div class="card-body">
-                        <h5 class="text-secondary mb-3">⚡ Controles en Vivo</h5>
+                        <h5 class="text-secondary mb-3"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Controles en Vivo</h5>
                         
-                        <!-- Bloqueo -->
                         <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-body-secondary rounded">
                             <span class="fw-bold" id="lock-status-text">Entregas Habilitadas</span>
-                            <button id="btn-toggle-lock" class="btn btn-sm btn-outline-danger" onclick="toggleLock()">⏸️ Pausar Entregas</button>
+                            <button id="btn-toggle-lock" class="btn btn-sm btn-outline-danger" onclick="toggleLock()"><i class="bi bi-pause-circle me-1"></i> Pausar</button>
                         </div>
                         
-                        <!-- Temporizador -->
                         <div class="input-group mb-3">
-                            <input type="number" id="timer-minutes" class="form-control" placeholder="Minutos (Ej. 15)" min="1">
-                            <button class="btn btn-warning fw-bold text-dark" onclick="startTimer()">⏱️ Iniciar Reloj</button>
-                            <button class="btn btn-secondary" onclick="stopTimer()" title="Detener">⏹️</button>
+                            <span class="input-group-text"><i class="bi bi-stopwatch"></i></span>
+                            <input type="number" id="timer-minutes" class="form-control" placeholder="Minutos" min="1">
+                            <button class="btn btn-warning fw-bold text-dark" onclick="startTimer()"> Iniciar</button>
+                            <button class="btn btn-secondary" onclick="stopTimer()"><i class="bi bi-stop-fill"></i></button>
                         </div>
 
-                        <!-- Megáfono -->
                         <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-megaphone-fill"></i></span>
                             <input type="text" id="announce-text" class="form-control" placeholder="Aviso para todos...">
-                            <button class="btn btn-info fw-bold text-white" onclick="sendAnnouncement()">📢 Enviar</button>
+                            <button class="btn btn-info fw-bold text-white" onclick="sendAnnouncement()"><i class="bi bi-send-fill"></i></button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tarjetas Tokens -->
+                <!-- TOKENS -->
                 <div class="row g-2 mb-4">
                     <div class="col-6">
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body text-center p-2">
-                                <h6 class="text-secondary small">Clave de Clase</h6>
-                                <button class="btn btn-sm btn-primary w-100 mb-2 fw-bold" onclick="generateToken()">+ Generar</button>
+                                <h6 class="text-secondary small"><i class="bi bi-key-fill me-1"></i> Clave de Clase</h6>
+                                <button class="btn btn-sm btn-primary w-100 mb-2 fw-bold" onclick="generateToken()"><i class="bi bi-plus-lg"></i> Generar</button>
                                 <ul id="tokens-list" class="list-group list-group-flush mb-0 border rounded small">
                                     <li class="list-group-item text-muted text-center p-1">Ninguna</li>
                                 </ul>
@@ -110,8 +122,8 @@
                     <div class="col-6">
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body text-center p-2">
-                                <h6 class="text-secondary small">Pase de Entrega</h6>
-                                <button class="btn btn-sm btn-warning w-100 mb-2 fw-bold text-dark" onclick="generateUploadToken()">+ Generar</button>
+                                <h6 class="text-secondary small"><i class="bi bi-ticket-detailed-fill me-1"></i> Pase de Entrega</h6>
+                                <button class="btn btn-sm btn-warning w-100 mb-2 fw-bold text-dark" onclick="generateUploadToken()"><i class="bi bi-plus-lg"></i> Generar</button>
                                 <ul id="upload-tokens-list" class="list-group list-group-flush mb-0 border rounded small">
                                     <li class="list-group-item text-muted text-center p-1">Ninguno</li>
                                 </ul>
@@ -120,47 +132,62 @@
                     </div>
                 </div>
 
-                <!-- Compartir Material -->
-                <div class="card shadow-sm border-0 mb-4">
+                <!-- ENCUESTAS EN VIVO -->
+                <div class="card shadow-sm border-0 mb-4 border-start border-primary border-4">
                     <div class="card-body">
-                        <h5 class="text-secondary mb-3">Compartir Material</h5>
-                        <ul class="nav nav-tabs mb-3 small" id="materialTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-pane" type="button">🔗 Enlace</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-pane" type="button">📄 Archivo Físico</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="materialTabsContent">
-                            <div class="tab-pane fade show active" id="link-pane" role="tabpanel">
-                                <input type="text" id="link-title" class="form-control form-control-sm mb-2" placeholder="Título (Ej: Wikipedia)">
-                                <input type="url" id="link-url" class="form-control form-control-sm mb-2" placeholder="https://...">
-                                <button class="btn btn-sm btn-success w-100" onclick="shareLink()">Compartir Enlace</button>
+                        <h5 class="text-secondary mb-3"><i class="bi bi-bar-chart-fill text-primary me-1"></i> Encuesta en Vivo</h5>
+                        <div id="poll-setup">
+                            <input type="text" id="poll-q" class="form-control form-control-sm mb-2" placeholder="Pregunta...">
+                            <div class="row g-1 mb-2">
+                                <div class="col-6"><input type="text" id="poll-o1" class="form-control form-control-sm" placeholder="Opción A"></div>
+                                <div class="col-6"><input type="text" id="poll-o2" class="form-control form-control-sm" placeholder="Opción B"></div>
                             </div>
-                            <div class="tab-pane fade" id="file-pane" role="tabpanel">
-                                <input type="file" id="file-upload" class="form-control form-control-sm mb-2">
-                                <button class="btn btn-sm btn-success w-100" id="btn-upload-file" onclick="uploadFile()">Subir Archivo</button>
-                                <div id="upload-progress" class="mt-2 text-center text-primary small" style="display: none;">Subiendo...</div>
+                            <div class="row g-1 mb-2">
+                                <div class="col-6"><input type="text" id="poll-o3" class="form-control form-control-sm" placeholder="Opción C (Opcional)"></div>
+                                <div class="col-6"><input type="text" id="poll-o4" class="form-control form-control-sm" placeholder="Opción D (Opcional)"></div>
                             </div>
+                            <button class="btn btn-sm btn-primary w-100 fw-bold" onclick="startPoll()"><i class="bi bi-rocket-takeoff-fill me-1"></i> Lanzar Encuesta</button>
+                        </div>
+                        <div id="poll-results" style="display: none;">
+                            <p class="fw-bold text-primary mb-2 small" id="poll-live-q"></p>
+                            <div id="poll-bars" class="mb-3"></div>
+                            <button class="btn btn-sm btn-danger w-100 fw-bold" onclick="stopPoll()"><i class="bi bi-x-circle-fill me-1"></i> Cerrar Encuesta</button>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- PANEL DERECHO -->
             <div class="col-lg-8 col-md-7">
                 
-                <!-- Q&A (Pizarra de Dudas) -->
-                <div class="card shadow-sm mb-4 border-0 border-start border-info border-4">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0 text-info">🙋‍♂️ Dudas de los Alumnos en Vivo</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="loadStatus()">🔄 Refrescar</button>
+                <div class="row">
+                    <!-- Q&A (Dudas) -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+                            <div class="card-body">
+                                <h5 class="mb-2 text-info"><i class="bi bi-patch-question-fill me-1"></i> Dudas de Alumnos</h5>
+                                <ul class="list-group list-group-flush" id="questions-list">
+                                    <li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">No hay dudas por ahora.</li>
+                                </ul>
+                            </div>
                         </div>
-                        <ul class="list-group" id="questions-list">
-                            <li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed">No hay dudas por ahora.</li>
-                        </ul>
+                    </div>
+
+                    <!-- Pizarra Rápida de Código -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100 bg-body-secondary">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0 text-secondary"><i class="bi bi-code-square me-1"></i> Pizarra de Código</h5>
+                                </div>
+                                <textarea id="snippet-text" class="form-control font-monospace small mb-2" rows="4" placeholder="Escribe HTML, CSS, comandos..."></textarea>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-success flex-grow-1 fw-bold" onclick="sendSnippet()"><i class="bi bi-broadcast me-1"></i> Proyectar</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="clearSnippet()"><i class="bi bi-eraser-fill"></i></button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -168,10 +195,10 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0 text-secondary">Trabajos Recibidos</h5>
+                            <h5 class="mb-0 text-secondary"><i class="bi bi-inboxes-fill me-1"></i> Trabajos Recibidos</h5>
                             <div class="mt-2 mt-md-0 d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelectedSubmissions()">🗑️ Eliminar</button>
-                                <button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="downloadAllSubmissions()">📦 Descargar Todos + Excel</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelectedSubmissions()"><i class="bi bi-trash3-fill me-1"></i> Eliminar</button>
+                                <button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="downloadAllSubmissions()"><i class="bi bi-file-earmark-zip-fill me-1"></i> Descargar + Excel</button>
                             </div>
                         </div>
                         <ul class="list-group" id="submissions-list" style="max-height: 400px; overflow-y: auto;">
@@ -180,11 +207,28 @@
                     </div>
                 </div>
 
-                <!-- Materiales de la Pizarra -->
+                <!-- Compartir Material Físico/Link -->
                 <div class="card shadow-sm border-0 bg-body-tertiary">
                     <div class="card-body">
-                        <h5 class="text-secondary mb-3">Pizarra (Materiales enviados)</h5>
-                        <ul class="list-group" id="materials-list">
+                        <div class="row align-items-end mb-3">
+                            <div class="col-md-5">
+                                <h5 class="text-secondary mb-2"><i class="bi bi-share-fill me-1"></i> Compartir Material</h5>
+                                <input type="text" id="link-title" class="form-control form-control-sm mb-1" placeholder="Título (Ej: Wikipedia)">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="url" id="link-url" class="form-control" placeholder="https://...">
+                                    <button class="btn btn-success fw-bold" onclick="shareLink()">Compartir</button>
+                                </div>
+                            </div>
+                            <div class="col-md-7 mt-2 mt-md-0 border-start">
+                                <div class="input-group input-group-sm">
+                                    <input type="file" id="file-upload" class="form-control">
+                                    <button class="btn btn-success fw-bold" id="btn-upload-file" onclick="uploadFile()"><i class="bi bi-cloud-arrow-up-fill me-1"></i> Subir</button>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted border-top pt-2"><i class="bi bi-folder2-open me-1"></i> Materiales Actuales:</h6>
+                        <ul class="list-group list-group-flush" id="materials-list">
                             <li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>
                         </ul>
                     </div>
@@ -201,20 +245,21 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Lógica -->
     <script>
-        let isLocked = false;
         setInterval(() => {
-            if (document.getElementById('admin-content').style.display === 'block') {
-                loadStatus(); // Auto-refresh cada 10s en panel admin también
-            }
+            if (document.getElementById('admin-content').style.display === 'block') loadStatus();
         }, 10000);
 
         function togglePassword() {
             const passInput = document.getElementById('admin-pass');
             const btnEye = document.getElementById('btn-eye');
-            if (passInput.type === 'password') { passInput.type = 'text'; btnEye.innerText = '🙈'; } 
-            else { passInput.type = 'password'; btnEye.innerText = '👁️'; }
+            if (passInput.type === 'password') { 
+                passInput.type = 'text'; 
+                btnEye.innerHTML = '<i class="bi bi-eye-slash-fill"></i>'; 
+            } else { 
+                passInput.type = 'password'; 
+                btnEye.innerHTML = '<i class="bi bi-eye-fill"></i>'; 
+            }
         }
 
         function adminLogin() {
@@ -226,8 +271,7 @@
                 loadStatus();
             } else {
                 const err = document.getElementById('admin-error');
-                err.style.display = 'block';
-                setTimeout(() => err.style.display = 'none', 3000);
+                err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 3000);
             }
         }
 
@@ -242,194 +286,155 @@
                 renderSubmissions(data.studentSubmissions);
                 renderQuestions(data.questions);
 
-                // Update Storage
+                document.getElementById('file-limit-select').value = data.maxFileSizeMB;
+
+                // Storage
                 if (data.totalBytes !== undefined) {
                     const maxBytes = 250 * 1024 * 1024;
                     const mbUsed = (data.totalBytes / (1024 * 1024)).toFixed(2);
                     const percentage = Math.min((data.totalBytes / maxBytes) * 100, 100);
-                    
                     document.getElementById('storage-text').innerText = `${mbUsed} MB`;
                     document.getElementById('storage-bar').style.width = `${percentage}%`;
                     if (percentage > 80) document.getElementById('storage-bar').className = 'progress-bar bg-danger';
                     else document.getElementById('storage-bar').className = 'progress-bar bg-success';
                 }
 
-                // Update Lock Status
-                isLocked = data.locked;
+                // Lock Status
                 const lockBtn = document.getElementById('btn-toggle-lock');
                 const lockTxt = document.getElementById('lock-status-text');
-                if (isLocked) {
-                    lockBtn.className = 'btn btn-sm btn-success';
-                    lockBtn.innerText = '▶️ Reanudar Entregas';
-                    lockTxt.innerText = 'Entregas PAUSADAS';
-                    lockTxt.className = 'fw-bold text-danger';
+                if (data.locked) {
+                    lockBtn.className = 'btn btn-sm btn-success'; lockBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Reanudar';
+                    lockTxt.innerText = 'Entregas Pausadas'; lockTxt.className = 'fw-bold text-danger';
                 } else {
-                    lockBtn.className = 'btn btn-sm btn-outline-danger';
-                    lockBtn.innerText = '⏸️ Pausar Entregas';
-                    lockTxt.innerText = 'Entregas Habilitadas';
-                    lockTxt.className = 'fw-bold text-success';
+                    lockBtn.className = 'btn btn-sm btn-outline-danger'; lockBtn.innerHTML = '<i class="bi bi-pause-circle me-1"></i> Pausar';
+                    lockTxt.innerText = 'Entregas Habilitadas'; lockTxt.className = 'fw-bold text-success';
                 }
 
-            } catch (e) {
-                console.error('Error:', e);
-            }
+                if (document.getElementById('snippet-text').getAttribute('data-loaded') !== 'true') {
+                    document.getElementById('snippet-text').value = data.snippet;
+                    document.getElementById('snippet-text').setAttribute('data-loaded', 'true');
+                }
+
+                // Poll status
+                if (data.poll) {
+                    document.getElementById('poll-setup').style.display = 'none';
+                    document.getElementById('poll-results').style.display = 'block';
+                    document.getElementById('poll-live-q').innerText = data.poll.question;
+                    
+                    const bars = document.getElementById('poll-bars');
+                    bars.innerHTML = '';
+                    const totalVotes = data.poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+                    data.poll.options.forEach(opt => {
+                        const pct = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
+                        bars.innerHTML += `
+                            <div class="mb-1 small d-flex justify-content-between">
+                                <span>${opt.text}</span> <strong>${pct}% (${opt.votes})</strong>
+                            </div>
+                            <div class="progress mb-2" style="height: 10px;">
+                                <div class="progress-bar bg-info" style="width: ${pct}%"></div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    document.getElementById('poll-setup').style.display = 'block';
+                    document.getElementById('poll-results').style.display = 'none';
+                }
+
+            } catch (e) {}
         }
 
-        // --- Nuevas funciones de control ---
-        async function toggleLock() {
-            await fetch('/api/admin/toggle-lock', { method: 'POST' });
+        async function setLimit() {
+            const size = document.getElementById('file-limit-select').value;
+            await fetch('/api/admin/limit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sizeMB: size }) });
+        }
+
+        async function sendSnippet() {
+            const text = document.getElementById('snippet-text').value;
+            await fetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+        }
+
+        async function clearSnippet() {
+            document.getElementById('snippet-text').value = '';
+            await fetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: '' }) });
+        }
+
+        async function startPoll() {
+            const q = document.getElementById('poll-q').value.trim();
+            const o1 = document.getElementById('poll-o1').value.trim();
+            const o2 = document.getElementById('poll-o2').value.trim();
+            const o3 = document.getElementById('poll-o3').value.trim();
+            const o4 = document.getElementById('poll-o4').value.trim();
+            
+            if (!q || !o1 || !o2) return alert('Debes llenar la pregunta y al menos dos opciones.');
+            
+            const options = [o1, o2];
+            if (o3) options.push(o3);
+            if (o4) options.push(o4);
+
+            await fetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'start', question: q, options }) });
             loadStatus();
         }
 
+        async function stopPoll() {
+            await fetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stop' }) });
+            loadStatus();
+        }
+
+        async function toggleLock() { await fetch('/api/admin/toggle-lock', { method: 'POST' }); loadStatus(); }
         async function startTimer() {
             const mins = parseInt(document.getElementById('timer-minutes').value);
             if (!mins || mins <= 0) return alert('Ingresa un tiempo válido');
-            await fetch('/api/admin/timer', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ minutes: mins })
-            });
-            document.getElementById('timer-minutes').value = '';
-            alert(`Temporizador iniciado por ${mins} minutos.`);
-            loadStatus();
+            await fetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: mins }) });
+            document.getElementById('timer-minutes').value = ''; loadStatus();
         }
-
-        async function stopTimer() {
-            await fetch('/api/admin/timer', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ minutes: 0 })
-            });
-            alert('Temporizador detenido.');
-            loadStatus();
-        }
-
+        async function stopTimer() { await fetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: 0 }) }); loadStatus(); }
         async function sendAnnouncement() {
             const msg = document.getElementById('announce-text').value.trim();
             if (!msg) return;
-            await fetch('/api/admin/announce', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg })
-            });
+            await fetch('/api/admin/announce', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
             document.getElementById('announce-text').value = '';
-            alert('Aviso enviado a todos los alumnos.');
         }
 
-        async function resolveQuestion(id) {
-            await fetch('/api/admin/delete-question', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
-            });
-            loadStatus();
-        }
-
+        async function resolveQuestion(id) { await fetch('/api/admin/delete-question', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); loadStatus(); }
         function renderQuestions(questions) {
             const list = document.getElementById('questions-list');
-            if (!questions || questions.length === 0) {
-                list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">No hay dudas por ahora.</li>';
-                return;
-            }
+            if (!questions || questions.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">No hay dudas.</li>';
             list.innerHTML = '';
-            questions.forEach(q => {
-                list.innerHTML += `
-                    <li class="list-group-item border-info bg-transparent py-2 mb-2 rounded shadow-sm">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong class="text-info">${q.name}</strong> <small class="text-muted">(${q.time})</small>
-                                <p class="mb-0 mt-1">${q.text}</p>
-                            </div>
-                            <button class="btn btn-sm btn-outline-success ms-2 text-nowrap" onclick="resolveQuestion('${q.id}')">✅ Resuelta</button>
-                        </div>
-                    </li>
-                `;
-            });
+            questions.forEach(q => list.innerHTML += `<li class="list-group-item bg-transparent py-2 px-1 border-bottom"><div class="d-flex justify-content-between align-items-center"><div><strong class="text-info small"><i class="bi bi-person-fill"></i> ${q.name}</strong> <span class="small d-block text-muted mt-1">${q.text}</span></div><button class="btn btn-sm btn-outline-success ms-2 p-1 py-0" onclick="resolveQuestion('${q.id}')" title="Marcar como resuelta"><i class="bi bi-check2"></i></button></div></li>`);
         }
-        // -----------------------------------
-
-        function renderTokens(tokens) {
-            const list = document.getElementById('tokens-list');
-            if (tokens.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center p-1">Ninguna</li>';
-            list.innerHTML = '';
-            tokens.forEach(t => list.innerHTML += `<li class="list-group-item fw-bold text-center text-primary fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`);
-        }
-
-        function renderUploadTokens(tokens) {
-            const list = document.getElementById('upload-tokens-list');
-            if (tokens.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center p-1">Ninguno</li>';
-            list.innerHTML = '';
-            tokens.forEach(t => list.innerHTML += `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`);
-        }
-
+        function renderTokens(tokens) { document.getElementById('tokens-list').innerHTML = tokens.length === 0 ? '<li class="list-group-item text-muted text-center p-1">Ninguna</li>' : tokens.map(t => `<li class="list-group-item fw-bold text-center text-primary fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`).join(''); }
+        function renderUploadTokens(tokens) { document.getElementById('upload-tokens-list').innerHTML = tokens.length === 0 ? '<li class="list-group-item text-muted text-center p-1">Ninguno</li>' : tokens.map(t => `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`).join(''); }
         function renderSubmissions(submissions) {
             window.currentSubmissions = submissions;
             const list = document.getElementById("submissions-list");
             if (submissions.length === 0) return list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
-            
             list.innerHTML = "";
-            // Reverse so newest is on top
             [...submissions].reverse().forEach(s => {
-                list.innerHTML += `
-                    <li class="list-group-item py-2">
-                        <div class="d-flex w-100 justify-content-between align-items-center">
-                            <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
-                                <input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}">
-                                <div class="text-truncate" title="${s.title}">
-                                    <h6 class="mb-0">📄 ${s.title}</h6>
-                                    <small class="text-muted">De: ${s.name} (${s.grade})</small>
-                                </div>
-                            </div>
-                            <a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap ms-2">⬇️</a>
-                        </div>
-                    </li>
-                `;
+                list.innerHTML += `<li class="list-group-item py-2"><div class="d-flex w-100 justify-content-between align-items-center"><div class="d-flex align-items-center flex-grow-1 overflow-hidden"><input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}"><div class="text-truncate" title="${s.title}"><h6 class="mb-0"><i class="bi bi-file-earmark-text text-secondary me-1"></i> ${s.title}</h6><small class="text-muted"><i class="bi bi-person me-1"></i> ${s.name} (${s.grade})</small></div></div><a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap ms-2" title="Descargar"><i class="bi bi-download"></i></a></div></li>`;
             });
         }
-
         function downloadAllSubmissions() {
             if (!window.currentSubmissions || window.currentSubmissions.length === 0) return alert("No hay trabajos para descargar.");
-            const grado = prompt("Por favor ingresa el grado (Ej. 5to_Secundaria):");
-            if (!grado) return;
-            const colegio = prompt("Por favor ingresa el nombre del colegio:");
-            if (!colegio) return;
+            const grado = prompt("Grado (Ej. 5to_Secundaria):"); if (!grado) return;
+            const colegio = prompt("Nombre del colegio:"); if (!colegio) return;
             window.location.href = `/api/admin/download-zip?grado=${encodeURIComponent(grado)}&colegio=${encodeURIComponent(colegio)}`;
         }
-
         async function deleteSelectedSubmissions() {
             const checkboxes = document.querySelectorAll(".submission-checkbox:checked");
             const ids = Array.from(checkboxes).map(cb => cb.value);
-            if (ids.length === 0) return alert("Selecciona al menos un archivo.");
-            if (!confirm(`¿Eliminar ${ids.length} archivo(s)?`)) return;
-
-            await fetch("/api/admin/delete-submissions", {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids })
-            });
+            if (ids.length === 0 || !confirm(`¿Eliminar ${ids.length} archivo(s)?`)) return;
+            await fetch("/api/admin/delete-submissions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
             loadStatus();
         }
-
         function renderMaterials(materials) {
             const list = document.getElementById('materials-list');
             if (materials.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>';
-            list.innerHTML = '';
-            materials.forEach(m => {
-                const icon = m.type === 'link' ? '🔗' : '📄';
-                list.innerHTML += `
-                    <li class="list-group-item py-2">
-                        <div class="d-flex w-100 justify-content-between align-items-center">
-                            <h6 class="mb-0 text-truncate pe-2">${icon} ${m.title}</h6>
-                            <span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase">${m.type}</span>
-                        </div>
-                    </li>
-                `;
-            });
+            list.innerHTML = materials.map(m => `<li class="list-group-item py-2 bg-transparent px-1 border-bottom"><div class="d-flex w-100 justify-content-between align-items-center"><h6 class="mb-0 text-truncate pe-2 small"><i class="bi ${m.type === 'link' ? 'bi-link-45deg text-primary' : 'bi-file-earmark-arrow-down text-success'} fs-5 me-1"></i> ${m.title}</h6><span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase" style="font-size:0.6rem;">${m.type}</span></div></li>`).join('');
         }
-
         async function generateToken() { await fetch('/api/admin/token', { method: 'POST' }); loadStatus(); }
         async function generateUploadToken() { await fetch('/api/admin/upload-token', { method: 'POST' }); loadStatus(); }
         async function shareLink() {
-            const title = document.getElementById('link-title').value;
-            const url = document.getElementById('link-url').value;
+            const title = document.getElementById('link-title').value; const url = document.getElementById('link-url').value;
             if (!title || !url) return;
             await fetch('/api/admin/material', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'link', title, url }) });
             document.getElementById('link-title').value = ''; document.getElementById('link-url').value = ''; loadStatus();
@@ -438,19 +443,13 @@
             const fileInput = document.getElementById('file-upload');
             if (fileInput.files.length === 0) return;
             const formData = new FormData(); formData.append('file', fileInput.files[0]);
-            
             document.getElementById('btn-upload-file').disabled = true;
-            document.getElementById('upload-progress').style.display = 'block';
             await fetch('/api/admin/upload', { method: 'POST', body: formData });
-            
-            fileInput.value = ''; document.getElementById('btn-upload-file').disabled = false;
-            document.getElementById('upload-progress').style.display = 'none'; loadStatus();
+            fileInput.value = ''; document.getElementById('btn-upload-file').disabled = false; loadStatus();
         }
         async function closeClass() {
-            if (!confirm('🛑 ATENCIÓN: ¿Seguro que quieres cerrar la clase? Se borrará TODO.')) return;
-            await fetch('/api/admin/close', { method: 'POST' });
-            alert('✅ Clase finalizada. Datos destruidos.');
-            loadStatus();
+            if (!confirm('🛑 ATENCIÓN: ¿Seguro que quieres cerrar la clase? Se borrará TODO permanentemente.')) return;
+            await fetch('/api/admin/close', { method: 'POST' }); alert('Clase finalizada.'); loadStatus();
         }
     </script>
 </body>

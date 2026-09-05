@@ -3,29 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Aula Virtual gratuita para estudiantes y docentes. Plataforma educativa para recepción de tareas, descarga de materiales y gestión de clases en tiempo real.">
-    <meta name="keywords" content="aula virtual, educación, educación a distancia, tareas, profesores, estudiantes, escuela en línea">
+    <meta name="description" content="Aula Virtual compuclase.click - Plataforma educativa interactiva gratuita para estudiantes y docentes. Envío de tareas, descarga de materiales, y gestión de clases en tiempo real.">
+    <meta name="keywords" content="aula virtual, educación a distancia, colegio, profesores, estudiantes, clases virtuales, tareas, plataforma educativa, herramientas digitales">
     <title>Aula Virtual - Estudiante</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🎓</text></svg>">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
-        body { background-color: #f8f9fa; overflow-x: hidden; }
-        .tech-grid {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px; z-index: -1; animation: scrollGrid 20s linear infinite;
+        body { 
+            margin: 0; padding: 0; overflow-x: hidden;
+            background: linear-gradient(-45deg, #09121a, #11283d, #083344, #1e1b4b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #f8f9fa;
         }
-        [data-bs-theme="dark"] body { background-color: #12151a; }
-        @keyframes scrollGrid { 0% { transform: translateY(0); } 100% { transform: translateY(50px); } }
-        .card { background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1) !important; }
-        .mouse-trail { position: absolute; width: 10px; height: 10px; background: #0d6efd; border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd; }
-        body { cursor: crosshair; }
-        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card { 
+            background: rgba(20, 25, 30, 0.75) !important; 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+        }
+
         #timer-display {
             font-size: 3rem; font-weight: 900; font-variant-numeric: tabular-nums;
-            text-shadow: 0 0 10px rgba(220, 53, 69, 0.8); letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(220, 53, 69, 0.9); letter-spacing: 2px;
         }
         #announcement-banner {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1050; display: none;
@@ -35,152 +48,191 @@
 </head>
 <body>
 
-    <div class="tech-grid"></div>
-
-    <!-- Banner de Avisos del Megáfono -->
+    <!-- Banner Megáfono -->
     <div id="announcement-banner" class="bg-info text-white text-center p-3 fw-bold fs-5">
-        📢 <span id="announcement-text"></span>
+        <i class="bi bi-megaphone-fill me-2"></i> <span id="announcement-text"></span>
         <button type="button" class="btn-close btn-close-white float-end" onclick="document.getElementById('announcement-banner').style.display='none'"></button>
     </div>
 
-    <!-- Botón Flotante para Dudas -->
-    <button id="btn-duda" class="btn btn-info btn-lg rounded-circle shadow-lg text-white" 
-            style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 24px;" 
+    <!-- Botón Duda -->
+    <button id="btn-duda" class="btn btn-info btn-lg rounded-circle shadow-lg text-white d-flex justify-content-center align-items-center" 
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 28px;" 
             data-bs-toggle="modal" data-bs-target="#questionModal" title="Tengo una duda">
-        🙋‍♂️
+        <i class="bi bi-person-raised-hand"></i>
     </button>
 
     <div class="container mt-5" style="max-width: 650px;">
         
-        <!-- Contenedor del Reloj (Oculto por defecto) -->
+        <!-- Contenedor del Reloj -->
         <div id="timer-container" class="mb-3 text-center" style="display: none;">
-            <div class="badge bg-danger mb-1 fs-6">⏳ Tiempo restante para entregar</div>
+            <div class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
             <div id="timer-display" class="text-danger">00:00</div>
         </div>
 
-        <div class="card shadow-sm text-center p-4 mb-5">
+        <div class="card shadow-sm text-center p-4 mb-4">
             <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
             <h1 class="mb-4 fw-bold text-white display-5">compuclase.click</h1>
 
-            <!-- SECCIÓN 1: Ingreso de Token -->
+            <!-- SECCIÓN LOGIN -->
             <div id="login-section">
-                <div class="alert alert-primary text-start small mb-4">
+                <div class="alert alert-primary text-start small mb-4 border-primary">
                     <ol class="mb-0 ps-3">
-                        <li>Pídele a tu profesor el código de la clase de hoy.</li>
-                        <li>Escríbelo en la casilla que está abajo.</li>
+                        <li>Pídele a tu profesor la clave de la clase de hoy.</li>
+                        <li>Escríbela en la casilla que está abajo.</li>
                         <li>Haz clic en "Ingresar a Clase".</li>
                     </ol>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold" placeholder="Ej: 4F2A1B" style="text-transform: uppercase;">
+                    <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-key-fill"></i></span>
+                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold" placeholder="Clave de 6 letras" style="text-transform: uppercase;">
                 </div>
-                <button class="btn btn-primary btn-lg w-100" onclick="login()">Ingresar a Clase</button>
+                <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="login()"><i class="bi bi-box-arrow-in-right me-2"></i> Ingresar a Clase</button>
                 <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
             </div>
 
-            <!-- SECCIÓN 2: Lista de Materiales y Tokens -->
+            <!-- SECCIÓN LOGUEADO -->
             <div id="materials-section" style="display: none;">
                 
+                <!-- Tokens -->
                 <div class="row text-center mb-4 g-2">
                     <div class="col-6">
                         <div class="p-2 bg-primary rounded text-white shadow-sm border border-primary">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Clave de Clase</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase</small>
                             <span class="fs-4 fw-bold" id="display-access-token">---</span>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">Pase de Entrega</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-ticket-detailed-fill me-1"></i> Pase Entrega</small>
                             <span class="fs-4 fw-bold" id="display-upload-token">---</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 border-secondary">
-                    <h4 class="mb-0 text-primary">Materiales de la Clase</h4>
-                    <button class="btn btn-sm btn-outline-danger" onclick="logout()">Salir</button>
+                    <h4 class="mb-0 text-primary"><i class="bi bi-journal-text me-2"></i>Contenido de Clase</h4>
+                    <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-box-arrow-left me-1"></i> Salir</button>
+                </div>
+
+                <!-- ENCUESTA EN VIVO -->
+                <div id="poll-container" class="alert alert-warning text-start mb-4 border-warning shadow" style="display: none;">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-bar-chart-steps me-2"></i> <span id="poll-question"></span></h5>
+                    <div id="poll-options" class="d-grid gap-2"></div>
                 </div>
                 
-                <ul class="list-group text-start shadow-sm mb-4" id="materials-list"></ul>
+                <!-- PIZARRA DE CÓDIGO -->
+                <div id="snippet-container" class="text-start mb-4 shadow" style="display: none;">
+                    <h5 class="text-secondary mb-2"><i class="bi bi-terminal me-2"></i> Pizarra del Profesor</h5>
+                    <pre class="bg-dark text-success p-3 rounded border border-secondary" style="white-space: pre-wrap; font-family: monospace;"><code id="snippet-display"></code></pre>
+                </div>
+                
+                <!-- MATERIALES -->
+                <div class="text-start mb-4">
+                    <h5 class="text-secondary mb-2"><i class="bi bi-folder-fill me-2"></i> Archivos y Enlaces</h5>
+                    <ul class="list-group shadow-sm" id="materials-list"></ul>
+                </div>
 
-                <!-- SECCIÓN 3: Enviar Trabajo -->
-                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative">
+                <!-- ENVIAR TRABAJO -->
+                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative shadow">
                     
-                    <!-- Overlay de Bloqueo -->
                     <div id="lock-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);" class="d-flex flex-column justify-content-center align-items-center text-center p-4">
-                        <span class="fs-1 mb-2">🛑</span>
+                        <i class="bi bi-lock-fill text-danger mb-2" style="font-size: 4rem;"></i>
                         <h4 class="text-danger fw-bold">ENTREGAS PAUSADAS</h4>
-                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío de trabajos momentáneamente.</p>
+                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío momentáneamente.</p>
                     </div>
 
-                    <h5 class="text-secondary mb-3">📤 Enviar Trabajo</h5>
+                    <h5 class="text-secondary mb-3"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
                     <div class="mb-2">
-                        <input type="text" id="student-name" class="form-control mb-2" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
-                        <input type="text" id="student-grade" class="form-control mb-2" placeholder="Tu Grado (Ej. 5to Secundaria)">
-                        <input type="text" id="upload-token" class="form-control mb-2" placeholder="Pase de Entrega" style="text-transform: uppercase;">
-                        <input type="file" id="upload-file" class="form-control">
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
+                            <input type="text" id="student-name" class="form-control" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
+                        </div>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-mortarboard-fill text-secondary"></i></span>
+                            <input type="text" id="student-grade" class="form-control" placeholder="Tu Grado (Ej. 5to Secundaria)">
+                        </div>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
+                            <input type="text" id="upload-token" class="form-control" placeholder="Pase de Entrega" style="text-transform: uppercase;">
+                        </div>
+                        
+                        <div class="input-group mt-3">
+                            <input type="file" id="upload-file" class="form-control">
+                        </div>
+                        <small class="text-muted" id="upload-limit-text"><i class="bi bi-info-circle me-1"></i> Límite por archivo: -- MB</small>
                     </div>
-                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()">Enviar Trabajo</button>
+                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()"><i class="bi bi-send-fill me-1"></i> Enviar Trabajo</button>
                     <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
                 </div>
 
                 <!-- Trabajos Recibidos -->
                 <div class="text-start p-3 mt-4">
-                    <h6 class="text-secondary mb-2 text-center">✅ Trabajos Entregados Recientemente</h6>
+                    <h6 class="text-secondary mb-2 text-center"><i class="bi bi-check2-all me-1"></i> Entregas Recientes</h6>
                     <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
                 </div>
             </div>
         </div>
+
+        <!-- SEO TEXT BLOQUE -->
+        <div class="card shadow-sm p-4 mb-4 text-start bg-body-tertiary border-0">
+            <h5 class="text-secondary fs-6 text-uppercase mb-3 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Sobre Nuestra Plataforma Educativa</h5>
+            <p class="small text-muted mb-2">
+                <strong>compuclase.click</strong> es un Aula Virtual interactiva y gratuita diseñada para modernizar la forma en que los docentes imparten sus clases y cómo los estudiantes entregan sus tareas.
+            </p>
+            <p class="small text-muted mb-2">
+                Nuestra plataforma educativa se enfoca en la privacidad y la inmediatez. No requiere registros molestos; funciona con un sistema de tokens de un solo uso que garantizan una conexión directa y en tiempo real. 
+            </p>
+            <p class="small text-muted mb-0">
+                Los profesores pueden lanzar encuestas, compartir fragmentos de código, proyectar relojes en vivo y recibir documentos que luego se descargan cómodamente ordenados. Además, por seguridad, todo archivo compartido se destruye permanentemente de nuestros servidores al finalizar la sesión de estudio.
+            </p>
+        </div>
+
+        <footer class="mt-2 mb-3 text-center text-muted small">
+            <div class="mb-2 d-flex justify-content-center gap-3">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted">Privacidad</a>
+                <span class="text-muted">|</span>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
+            </div>
+            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+        </footer>
     </div>
     
-    <!-- Modal de Preguntas -->
-    <div class="modal fade" id="questionModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal Dudas -->
+    <div class="modal fade" id="questionModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-body-tertiary">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title text-info">🙋‍♂️ Enviar una duda al profesor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title text-info"><i class="bi bi-chat-square-text-fill me-2"></i> Enviar una duda al profesor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="q-name" class="form-control mb-3" placeholder="Tu Nombre (Opcional)">
-                    <textarea id="q-text" class="form-control" rows="3" placeholder="Escribe tu pregunta aquí..."></textarea>
-                    <div id="q-msg" class="mt-2 text-success fw-bold text-center" style="display:none;">¡Pregunta enviada!</div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
+                        <input type="text" id="q-name" class="form-control" placeholder="Tu Nombre (Opcional)">
+                    </div>
+                    <textarea id="q-text" class="form-control" rows="3" placeholder="Escribe tu pregunta..."></textarea>
+                    <div id="q-msg" class="mt-2 text-success fw-bold text-center" style="display:none;"><i class="bi bi-check-circle-fill me-1"></i> ¡Pregunta enviada!</div>
                 </div>
                 <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-info w-100 fw-bold text-white" onclick="submitQuestion()">Enviar Duda</button>
+                    <button type="button" class="btn btn-info w-100 fw-bold text-white" onclick="submitQuestion()"><i class="bi bi-send-fill me-1"></i> Enviar Duda</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footers y Legales -->
-    <div class="container mb-2 text-center" style="max-width: 700px; opacity: 0.5;">
-        <p class="small text-muted mb-0">Aula Virtual para envío de trabajos y descarga de recursos en tiempo real.</p>
-    </div>
-    <footer class="mt-2 mb-3 text-center text-muted small">
-        <div class="mb-2 d-flex justify-content-center gap-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted">Privacidad</a>
-            <span class="text-muted">|</span>
-            <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
-        </div>
-        &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
-    </footer>
-
-    <!-- Modales Legales (Omitidos los cuerpos largos para ahorrar espacio, pero presentes para adsense) -->
-    <div class="modal fade" id="privacyModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-body small text-muted">Política de Privacidad y Cookies de Google AdSense aplicables. El sistema no guarda datos personales permanentemente.</div></div></div></div>
-    <div class="modal fade" id="termsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-body small text-muted">Plataforma de uso estrictamente educativo.</div></div></div></div>
+    <!-- Modales Legales -->
+    <div class="modal fade" id="privacyModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-header"><h5 class="modal-title">Política de Privacidad</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body small text-muted"><p>No recopilamos información personal sensible. El sistema es efímero. Utilizamos Google AdSense para anuncios. Google usa cookies para personalizar publicidad. Todo archivo subido se borra al acabar la clase.</p></div></div></div></div>
+    <div class="modal fade" id="termsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content bg-body-tertiary"><div class="modal-header"><h5 class="modal-title">Términos de Servicio</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body small text-muted"><p>Plataforma educativa gratuita. Prohibido subir malware o material protegido. El servicio se ofrece "tal cual" sin garantías de persistencia de archivos.</p></div></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         let currentToken = "";
         let refreshInterval = null;
-        
-        // Estado del Reloj y Avisos
         let targetTimer = null;
-        let localTimerInterval = null;
         let lastAnnouncementId = null;
-
+        let maxFileSizeLimit = 0; 
+        
         async function login() {
             const token = document.getElementById("token-input").value.trim().toUpperCase();
             if (!token) return alert("Por favor ingresa un token.");
@@ -191,13 +243,12 @@
                     currentToken = token;
                     document.getElementById("login-section").style.display = "none";
                     document.getElementById("materials-section").style.display = "block";
-                    document.getElementById("btn-duda").style.display = "block";
+                    document.getElementById("btn-duda").style.display = "flex";
                     loadMaterials();
-                    refreshInterval = setInterval(loadMaterials, 5000); // Polling más rápido (5s) para buena UX
+                    refreshInterval = setInterval(loadMaterials, 5000); 
                 } else {
-                    const err = document.getElementById("login-error");
-                    err.innerText = "Token incorrecto o clase no iniciada.";
-                    err.style.display = "block";
+                    document.getElementById("login-error").innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Token incorrecto o clase no iniciada.';
+                    document.getElementById("login-error").style.display = "block";
                 }
             } catch (e) { alert("Error de conexión."); }
         }
@@ -205,97 +256,121 @@
         function logout() {
             currentToken = "";
             if(refreshInterval) clearInterval(refreshInterval);
-            if(localTimerInterval) clearInterval(localTimerInterval);
-            document.getElementById("token-input").value = "";
-            document.getElementById("login-section").style.display = "block";
-            document.getElementById("materials-section").style.display = "none";
-            document.getElementById("btn-duda").style.display = "none";
-            document.getElementById("timer-container").style.display = "none";
-            document.getElementById("announcement-banner").style.display = "none";
+            location.reload();
         }
 
         async function loadMaterials() {
             if (!currentToken) return;
             try {
                 const res = await fetch("/api/student/materials", { headers: { "Authorization": currentToken } });
-                if (res.status === 403) return logout(); // Clase cerrada
+                if (res.status === 403) return logout();
                 const data = await res.json();
                 
                 document.getElementById("display-access-token").innerText = currentToken;
                 document.getElementById("display-upload-token").innerText = (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
-                // --- SISTEMA DE AVISOS ---
                 if (data.announcement && data.announcement.id !== lastAnnouncementId) {
                     lastAnnouncementId = data.announcement.id;
                     document.getElementById('announcement-text').innerText = data.announcement.text;
                     document.getElementById('announcement-banner').style.display = 'block';
-                    // Auto-ocultar el aviso después de 15 segundos
                     setTimeout(() => document.getElementById('announcement-banner').style.display = 'none', 15000);
                 }
 
-                // --- SISTEMA DE RELOJ Y BLOQUEO ---
                 targetTimer = data.timerEndTime;
-                updateLocalTimer(); // Actualizar UI de reloj
+                updateLocalTimer();
 
                 const lockOverlay = document.getElementById('lock-overlay');
                 const lockReason = document.getElementById('lock-reason');
                 if (data.locked) {
-                    lockOverlay.style.display = 'flex';
-                    lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
+                    lockOverlay.style.display = 'flex'; lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
                 } else if (targetTimer && Date.now() >= targetTimer) {
-                    lockOverlay.style.display = 'flex';
-                    lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
+                    lockOverlay.style.display = 'flex'; lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
                 } else {
                     lockOverlay.style.display = 'none';
                 }
 
-                // --- MATERIALES ---
+                if (data.snippet && data.snippet.trim() !== '') {
+                    document.getElementById('snippet-container').style.display = 'block';
+                    document.getElementById('snippet-display').innerText = data.snippet;
+                } else {
+                    document.getElementById('snippet-container').style.display = 'none';
+                }
+
+                if (data.poll) {
+                    document.getElementById('poll-container').style.display = 'block';
+                    document.getElementById('poll-question').innerText = data.poll.question;
+                    
+                    const hasVoted = localStorage.getItem('voted_' + data.poll.id);
+                    const pollOps = document.getElementById('poll-options');
+                    pollOps.innerHTML = '';
+
+                    if (hasVoted) {
+                        const totalVotes = data.poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+                        data.poll.options.forEach(opt => {
+                            const pct = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
+                            pollOps.innerHTML += `
+                                <div class="text-dark small d-flex justify-content-between mb-1">
+                                    <span>${opt.text}</span> <strong>${pct}%</strong>
+                                </div>
+                                <div class="progress mb-2" style="height: 15px;">
+                                    <div class="progress-bar bg-info text-dark fw-bold" style="width: ${pct}%"></div>
+                                </div>`;
+                        });
+                    } else {
+                        data.poll.options.forEach((opt, idx) => {
+                            pollOps.innerHTML += `<button class="btn btn-outline-dark fw-bold text-start" onclick="votePoll('${data.poll.id}', ${idx})"><i class="bi bi-circle me-2"></i> ${opt.text}</button>`;
+                        });
+                    }
+                } else {
+                    document.getElementById('poll-container').style.display = 'none';
+                }
+
+                maxFileSizeLimit = data.maxFileSize || 0;
+                document.getElementById('upload-limit-text').innerHTML = maxFileSizeLimit > 0 ? `<i class="bi bi-info-circle me-1"></i> Límite por archivo: ${maxFileSizeLimit} MB` : `<i class="bi bi-info-circle me-1"></i> Sin límite de tamaño`;
+
                 const list = document.getElementById("materials-list");
                 if (data.materials.length === 0) list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">Ningún material.</li>";
                 else {
                     list.innerHTML = "";
                     data.materials.forEach(m => {
-                        if (m.type === "link") list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold text-info">🔗 ${m.title}</a></li>`;
-                        else list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${m.title}">📄 ${m.title}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary">Descargar</a></li>`;
+                        if (m.type === "link") list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold text-info"><i class="bi bi-link-45deg fs-5 me-1"></i> ${m.title}</a></li>`;
+                        else list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${m.title}"><i class="bi bi-file-earmark-arrow-down fs-5 me-1 text-success"></i> ${m.title}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary" title="Descargar"><i class="bi bi-download"></i></a></li>`;
                     });
                 }
                 
-                // --- ENTREGAS ---
                 const subList = document.getElementById("student-submissions-list");
                 if (!data.submissions || data.submissions.length === 0) subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Nadie ha entregado aún.</li>";
                 else {
                     subList.innerHTML = "";
-                    const lastFive = data.submissions.slice(-5).reverse(); // Mostrar solo los últimos 5
-                    lastFive.forEach(s => subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">📄 ${s.title}</li>`);
+                    const lastFive = data.submissions.slice(-5).reverse();
+                    lastFive.forEach(s => subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary"><i class="bi bi-file-earmark-check text-success me-2"></i> ${s.title}</li>`);
                 }
 
-            } catch (e) { console.error("Error al cargar:", e); }
+            } catch (e) {}
         }
 
-        // Bucle local para el reloj (corre cada segundo)
+        async function votePoll(pollId, index) {
+            try {
+                await fetch("/api/student/vote", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken }, body: JSON.stringify({ pollId, optionIndex: index }) });
+                localStorage.setItem('voted_' + pollId, 'true');
+                loadMaterials();
+            } catch (e) { alert("Error al votar"); }
+        }
+
         function updateLocalTimer() {
             const container = document.getElementById('timer-container');
             const display = document.getElementById('timer-display');
-            if (!targetTimer) {
-                container.style.display = 'none';
-                return;
-            }
+            if (!targetTimer) return container.style.display = 'none';
             container.style.display = 'block';
             
             const now = Date.now();
             let diff = Math.max(0, Math.floor((targetTimer - now) / 1000));
-            
             const m = Math.floor(diff / 60).toString().padStart(2, '0');
             const s = (diff % 60).toString().padStart(2, '0');
             display.innerText = `${m}:${s}`;
             
-            // Si el tiempo es menor a 1 minuto, hacerlo titilar
-            if (diff > 0 && diff <= 60) {
-                display.style.animation = "blink 1s infinite";
-            } else {
-                display.style.animation = "none";
-            }
-            // Cuando llega a 0, la próxima llamada a loadMaterials pondrá el candado
+            if (diff > 0 && diff <= 60) display.style.animation = "blink 1s infinite";
+            else display.style.animation = "none";
         }
         setInterval(updateLocalTimer, 1000);
 
@@ -308,6 +383,10 @@
             
             if (!name || !grade || !token || !fileInput.files.length) return alert("Llena todos los campos y selecciona un archivo.");
 
+            if (maxFileSizeLimit > 0 && fileInput.files[0].size > maxFileSizeLimit * 1024 * 1024) {
+                return alert(`El archivo es muy pesado. El límite máximo permitido es ${maxFileSizeLimit} MB.`);
+            }
+
             const formData = new FormData();
             formData.append("uploadToken", token);
             formData.append("studentName", name);
@@ -315,7 +394,7 @@
             formData.append("file", fileInput.files[0]);
 
             const btn = document.getElementById("btn-submit");
-            btn.disabled = true; btn.innerText = "Enviando... ⏳";
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Enviando...';
             
             try {
                 const res = await fetch("/api/student/upload", { method: "POST", body: formData });
@@ -323,15 +402,15 @@
                 msgEl.style.display = "block";
                 
                 if (res.ok) {
-                    msgEl.className = "mt-2 text-center text-success fw-bold"; msgEl.innerText = "¡Trabajo enviado!";
+                    msgEl.className = "mt-2 text-center text-success fw-bold"; msgEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Trabajo enviado!';
                     fileInput.value = ""; loadMaterials(); 
                 } else {
-                    msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerText = data.error || "Error al enviar.";
+                    msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> ${data.error || "Error al enviar."}`;
                 }
             } catch (e) {
-                msgEl.style.display = "block"; msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerText = "Error de conexión.";
+                msgEl.style.display = "block"; msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerHTML = '<i class="bi bi-wifi-off me-1"></i> Error de conexión.';
             }
-            btn.disabled = false; btn.innerText = "Enviar Trabajo";
+            btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar Trabajo';
             setTimeout(() => msgEl.style.display = "none", 5000);
         }
 
@@ -341,10 +420,7 @@
             if (!text) return alert("Escribe una pregunta");
 
             try {
-                await fetch("/api/student/question", {
-                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken },
-                    body: JSON.stringify({ name, text })
-                });
+                await fetch("/api/student/question", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken }, body: JSON.stringify({ name, text }) });
                 document.getElementById("q-text").value = "";
                 document.getElementById("q-msg").style.display = "block";
                 setTimeout(() => {
@@ -353,17 +429,7 @@
                 }, 1500);
             } catch (e) { alert("Error al enviar"); }
         }
-        
-        // Estela del ratón
-        document.addEventListener("mousemove", function(e) {
-            const trail = document.createElement("div");
-            trail.className = "mouse-trail"; trail.style.left = e.clientX + "px"; trail.style.top = e.clientY + "px";
-            document.body.appendChild(trail);
-            requestAnimationFrame(() => { trail.style.transform = "translate(-50%, -50%) scale(0.1)"; trail.style.opacity = "0"; });
-            setTimeout(() => trail.remove(), 400);
-        });
 
-        // Estilo extra para titilar
         const style = document.createElement('style');
         style.innerHTML = `@keyframes blink { 50% { opacity: 0.3; } }`;
         document.head.appendChild(style);
