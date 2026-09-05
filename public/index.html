@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -8,66 +8,73 @@
     <title>Aula Virtual - Estudiante</title>
     <!-- Favicon @ -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>@</text></svg>">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452" crossorigin="anonymous"></script>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
-            background-color: #0f172a; /* Fondo oscuro y moderno */
-            cursor: crosshair; /* Cursor estilo tecnológico (mira/cruz) */
-            /* Cuadrícula Tech animada */
-            background-image: 
-                linear-gradient(rgba(13, 110, 253, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(13, 110, 253, 0.15) 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: scrollGrid 3s linear infinite; /* Animación más rápida para que se note */
+            background-color: #f8f9fa; 
+            overflow-x: hidden;
         }
-
-        /* Fotogramas para el movimiento infinito */
-        @keyframes scrollGrid {
-            0% { background-position: 0px 0px; }
-            100% { background-position: 40px 40px; }
-        }
-
-        /* Estilos para la estela del ratón */
-        .mouse-trail {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background-color: #0d6efd;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-            box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd;
-        }
-
-        .container { max-width: 600px; margin-top: 80px; position: relative; z-index: 1; }
         
-        /* Efecto tipo cristal (Glassmorphism) para modo oscuro */
+        /* Animación de Cuadrícula Tecnológica (Fondo) */
+        .tech-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: scrollGrid 20s linear infinite;
+        }
+        [data-bs-theme="dark"] body { background-color: #12151a; }
+        
+        @keyframes scrollGrid {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        /* Efecto Cristal (Glassmorphism) para la tarjeta principal */
         .card {
             background: rgba(33, 37, 41, 0.85) !important;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1) !important;
         }
 
-        #materials-section { display: none; }
+        /* Estela del Cursor */
+        .mouse-trail {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0d6efd;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd;
+        }
+
+        /* Custom Cursor cruz (Crosshair) */
+        body { cursor: crosshair; }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="tech-grid"></div>
+
+    <div class="container mt-5" style="max-width: 600px;">
         <div class="card shadow-sm text-center p-4">
             <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
             <h1 class="mb-4 fw-bold text-white display-5">compuclase.click</h1>
 
             <!-- SECCIÓN 1: Ingreso de Token -->
             <div id="login-section">
-                <div class="alert alert-info text-start mb-4">
-                    <strong>Pasos para entrar:</strong>
-                    <ol class="mb-0 mt-1">
+                <div class="alert alert-primary text-start small mb-4">
+                    <ol class="mb-0 ps-3">
                         <li>Pídele a tu profesor el código de la clase de hoy.</li>
                         <li>Escríbelo en la casilla que está abajo.</li>
                         <li>Haz clic en "Ingresar a Clase" para ver y descargar tus materiales.</li>
@@ -81,7 +88,7 @@
             </div>
 
             <!-- SECCIÓN 2: Lista de Materiales y Tokens -->
-            <div id="materials-section">
+            <div id="materials-section" style="display: none;">
                 
                 <!-- BANNERS DE TOKENS (Visible en proyector) -->
                 <div class="row text-center mb-4 g-2">
@@ -127,7 +134,7 @@
                     <div class="mb-2">
                         <input type="text" id="student-name" class="form-control mb-2" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
                         <input type="text" id="student-grade" class="form-control mb-2" placeholder="Tu Grado (Ej. 5to Secundaria)">
-                        <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: ENTREGA-XXXX)" style="text-transform: uppercase;">
+                        <input type="text" id="upload-token" class="form-control" placeholder="Pase (Ej: 4F2A1B)" style="text-transform: uppercase;">
                     </div>
                     <div class="mb-3">
                         <input type="file" id="upload-file" class="form-control">
@@ -228,7 +235,7 @@
                     err.style.display = "block";
                 }
             } catch (e) {
-                alert("Error de conexi�n.");
+                alert("Error de conexión.");
             }
         }
 
@@ -248,7 +255,7 @@
                 });
 
                 if (res.status === 403) {
-                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es v�lido.");
+                    alert("Acceso denegado: La clase ha sido cerrada por el profesor o tu token ya no es válido.");
                     logout();
                     return;
                 }
@@ -262,11 +269,11 @@
                 const list = document.getElementById("materials-list");
                 list.innerHTML = "";
                 if (data.materials.length === 0) {
-                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor a�n no ha compartido materiales.</li>";
+                    list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">El profesor aún no ha compartido materiales.</li>";
                 } else {
                     data.materials.forEach(m => {
                         if (m.type === "link") {
-                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold">?? ${m.title}</a></li>`;
+                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold">🔗 ${m.title}</a></li>`;
                         } else {
                             list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
                                 <span class="text-truncate pe-3" title="${m.title}">📄 ${m.title}</span>
@@ -278,11 +285,11 @@
                 
                 const subList = document.getElementById("student-submissions-list");
                 if (!data.submissions || data.submissions.length === 0) {
-                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">A�n no hay entregas.</li>";
+                    subList.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-0\">Aún no hay entregas.</li>";
                 } else {
                     subList.innerHTML = "";
                     data.submissions.forEach(s => {
-                        subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">?? ${s.title}</li>`;
+                        subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">📄 ${s.title}</li>`;
                     });
                 }
 
@@ -311,7 +318,7 @@
 
             const btn = document.getElementById("btn-submit");
             btn.disabled = true;
-            btn.innerText = "Enviando... ?";
+            btn.innerText = "Enviando... ⏳";
             
             try {
                 const res = await fetch("/api/student/upload", {
@@ -324,7 +331,7 @@
                 
                 if (res.ok) {
                     msgEl.className = "mt-2 text-center text-success fw-bold";
-                    msgEl.innerText = "�Trabajo enviado exitosamente!";
+                    msgEl.innerText = "¡Trabajo enviado exitosamente!";
                     fileInput.value = ""; 
                     document.getElementById("upload-token").value = ""; 
                     loadMaterials(); 
@@ -335,7 +342,7 @@
             } catch (e) {
                 msgEl.style.display = "block";
                 msgEl.className = "mt-2 text-center text-danger fw-bold";
-                msgEl.innerText = "Error de conexi�n.";
+                msgEl.innerText = "Error de conexión.";
             }
             
             btn.disabled = false;
@@ -360,4 +367,3 @@
     </script>
 </body>
 </html>
-
