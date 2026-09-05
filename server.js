@@ -35,9 +35,9 @@ let submissionsLocked = false;
 let timerEndTime = null;
 let latestAnnouncement = null;
 let studentQuestions = [];
-let liveSnippet = ""; // Pizarra de Código/Texto
-let currentPoll = null; // Encuesta { id, question, options: [{text, votes}] }
-let maxFileSizeMB = 10; // Límite de tamaño por archivo en MB (default 10)
+let liveSnippet = ""; 
+let currentPoll = null; 
+let maxFileSizeMB = 10; 
 
 const requireToken = (req, res, next) => {
     const token = req.headers['authorization'] || req.query.token;
@@ -102,11 +102,10 @@ app.post('/api/student/upload', upload.single('file'), (req, res) => {
     const { uploadToken, studentName, studentGrade } = req.body;
     if (!uploadToken || !uploadTokens.includes(uploadToken)) {
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        return res.status(403).json({ error: 'Pase de entrega inválido.' });
+        return res.status(403).json({ error: 'Código de Envío inválido.' });
     }
     if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo' });
 
-    // Verificación de límite de tamaño (en Backend también)
     if (maxFileSizeMB > 0 && req.file.size > maxFileSizeMB * 1024 * 1024) {
         if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         return res.status(400).json({ error: `El archivo excede el límite de ${maxFileSizeMB} MB permitido por el profesor.` });
@@ -169,6 +168,13 @@ app.post('/api/admin/token', (req, res) => {
 app.post('/api/admin/upload-token', (req, res) => {
     const newToken = crypto.randomBytes(3).toString('hex').toUpperCase();
     uploadTokens.push(newToken);
+    
+    // Al generar un nuevo pase de entrega, habilitar automáticamente las entregas y borrar timer vencido
+    submissionsLocked = false;
+    if (timerEndTime && Date.now() >= timerEndTime) {
+        timerEndTime = null;
+    }
+
     res.json({ token: newToken });
 });
 
@@ -240,6 +246,12 @@ app.get('/api/admin/download-zip', (req, res) => {
 
 app.post('/api/admin/toggle-lock', (req, res) => {
     submissionsLocked = !submissionsLocked;
+    
+    // Si estamos desbloqueando, eliminar el contador vencido para que no lo vuelva a bloquear de inmediato
+    if (!submissionsLocked && timerEndTime && Date.now() >= timerEndTime) {
+        timerEndTime = null;
+    }
+    
     res.json({ success: true, locked: submissionsLocked });
 });
 
