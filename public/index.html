@@ -22,7 +22,6 @@
             color: #f8f9fa;
         }
         
-        /* EFECTO VISUAL ANIMADO (CUBOS FLOTANTES Y FONDO INTENSO) */
         .bg-animated {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
             background: #0f172a; 
@@ -168,7 +167,7 @@
                     <div id="lock-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);" class="d-flex flex-column justify-content-center align-items-center text-center p-4">
                         <i class="bi bi-lock-fill text-danger mb-2" style="font-size: 4rem;"></i>
                         <h4 class="text-danger fw-bold">ENTREGAS PAUSADAS</h4>
-                        <p class="text-white small mb-0" id="lock-reason">El profesor ha bloqueado el envío momentáneamente.</p>
+                        <p class="text-white small mb-0" id="lock-reason">El profesor ha pausado las entregas momentáneamente.</p>
                     </div>
 
                     <h5 class="text-secondary mb-3"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
@@ -203,14 +202,10 @@
             </div>
         </div>
 
-        <!-- SEO TEXT BLOQUE -->
         <div class="card shadow-sm p-4 mb-4 text-start bg-body-tertiary border-0">
             <h5 class="text-secondary fs-6 text-uppercase mb-3 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Sobre Nuestra Plataforma Educativa</h5>
             <p class="small text-muted mb-2">
                 <strong>compuclase.click</strong> es un Aula Virtual interactiva y gratuita diseñada para modernizar la forma en que los docentes imparten sus clases y cómo los estudiantes entregan sus tareas.
-            </p>
-            <p class="small text-muted mb-2">
-                Nuestra plataforma educativa se enfoca en la privacidad y la inmediatez. No requiere registros molestos; funciona con un sistema de tokens de un solo uso que garantizan una conexión directa y en tiempo real. 
             </p>
             <p class="small text-muted mb-0">
                 Los profesores pueden lanzar encuestas, compartir fragmentos de código, proyectar relojes en vivo y recibir documentos que luego se descargan cómodamente ordenados. Además, por seguridad, todo archivo compartido se destruye permanentemente de nuestros servidores al finalizar la sesión de estudio.
@@ -223,7 +218,7 @@
                 <span class="text-muted">|</span>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
             </div>
-            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+            &copy; 2026 Aula Virtual (v3.0). Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
         </footer>
     </div>
     
@@ -255,7 +250,7 @@
     <script>
         let currentToken = "";
         let refreshInterval = null;
-        let localTimerRemaining = null; // EL MANEJO CORRECTO DEL RELOJ
+        let localTimerRemaining = null; 
         let maxFileSizeLimit = 0; 
         
         let isFirstLoad = true;
@@ -309,11 +304,30 @@
             location.reload();
         }
 
+        function applyLockState(isLocked, reasonText) {
+            const overlay = document.getElementById('lock-overlay');
+            const reason = document.getElementById('lock-reason');
+            const formElements = ['student-name', 'student-grade', 'upload-token', 'upload-file', 'btn-submit'];
+            
+            if (isLocked) {
+                overlay.style.display = 'flex';
+                reason.innerText = reasonText;
+                formElements.forEach(id => document.getElementById(id).disabled = true);
+            } else {
+                overlay.style.display = 'none';
+                formElements.forEach(id => document.getElementById(id).disabled = false);
+            }
+        }
+
         async function loadMaterials() {
             if (!currentToken) return;
             try {
-                // EVITAR CACHÉ DEL NAVEGADOR AGREGANDO DATE.NOW()
-                const res = await fetch(`/api/student/materials?_t=${Date.now()}`, { headers: { "Authorization": currentToken } });
+                // CACHE KILLER DEFINITIVO
+                const res = await fetch(`/api/student/materials?_t=${Date.now()}`, { 
+                    headers: { "Authorization": currentToken },
+                    cache: "no-store" 
+                });
+                
                 if (res.status === 403) return logout();
                 const data = await res.json();
                 
@@ -342,17 +356,13 @@
                     localTimerRemaining = null;
                 }
 
-                // LÓGICA DE BLOQUEO ACTUALIZADA
-                const lockOverlay = document.getElementById('lock-overlay');
-                const lockReason = document.getElementById('lock-reason');
-                if (data.locked) {
-                    lockOverlay.style.display = 'flex'; 
-                    lockReason.innerText = "El profesor ha pausado las entregas momentáneamente.";
+                // LÓGICA DE BLOQUEO BLINDADA
+                if (data.locked === true) {
+                    applyLockState(true, "El profesor ha pausado las entregas momentáneamente.");
                 } else if (localTimerRemaining !== null && localTimerRemaining <= 0) {
-                    lockOverlay.style.display = 'flex'; 
-                    lockReason.innerText = "¡El tiempo para entregar se ha agotado!";
+                    applyLockState(true, "¡El tiempo para entregar se ha agotado!");
                 } else {
-                    lockOverlay.style.display = 'none';
+                    applyLockState(false, "");
                 }
 
                 if (data.snippet && data.snippet !== lastSnippet) {
@@ -458,11 +468,10 @@
                 display.style.fontSize = "2.5rem";
                 display.style.animation = "none";
                 
-                // Aplicar el overlay visualmente también desde aquí
-                document.getElementById('lock-overlay').style.display = 'flex'; 
-                document.getElementById('lock-reason').innerText = "¡El tiempo para entregar se ha agotado!";
+                // Aplicar el bloqueo de forma garantizada
+                applyLockState(true, "¡El tiempo para entregar se ha agotado!");
             } else {
-                localTimerRemaining--; // Restamos localmente
+                localTimerRemaining--; 
                 
                 title.style.display = 'inline-block';
                 display.style.fontSize = "3rem";

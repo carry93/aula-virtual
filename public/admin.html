@@ -238,7 +238,7 @@
         </div>
         
         <footer class="mt-5 mb-3 text-center text-muted small">
-            &copy; 2026 Aula Virtual. Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+            &copy; 2026 Aula Virtual (v3.0). Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
         </footer>
     </div>
 
@@ -278,7 +278,7 @@
         async function loadStatus() {
             try {
                 // EVITAMOS CACHÉ DEL NAVEGADOR
-                const res = await fetch(`/api/admin/status?_t=${Date.now()}`);
+                const res = await fetch(`/api/admin/status?_t=${Date.now()}`, { cache: 'no-store' });
                 const data = await res.json();
                 
                 renderTokens(data.activeTokens);
