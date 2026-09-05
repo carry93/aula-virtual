@@ -34,13 +34,13 @@
                 <p class="text-muted small">Acceso exclusivo para docentes</p>
             </div>
             <div class="mb-3">
-                <input type="text" id="admin-user" class="form-control" placeholder="Usuario">
+                <input type="text" id="admin-user" class="form-control" placeholder="Usuario" autocomplete="username">
             </div>
             <div class="mb-3 password-container">
-                <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña">
-                <button class="toggle-password" onclick="togglePassword()" id="btn-eye"><i class="bi bi-eye-fill"></i></button>
+                <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" autocomplete="current-password">
+                <button type="button" class="toggle-password" onclick="togglePassword()" id="btn-eye"><i class="bi bi-eye-fill"></i></button>
             </div>
-            <button class="btn btn-primary w-100 fw-bold" onclick="adminLogin()"><i class="bi bi-box-arrow-in-right me-1"></i> Ingresar</button>
+            <button class="btn btn-primary w-100 fw-bold" id="btn-login" onclick="adminLogin()"><i class="bi bi-box-arrow-in-right me-1"></i> Ingresar</button>
             <div id="admin-error" class="alert alert-danger mt-3 text-center small" style="display: none;">Credenciales incorrectas</div>
         </div>
     </div>
@@ -51,7 +51,10 @@
         <!-- Cabecera -->
         <div class="d-flex justify-content-between align-items-center mb-4 bg-body-tertiary p-3 rounded shadow-sm border-start border-primary border-5">
             <h2 class="m-0 text-primary"><i class="bi bi-person-workspace me-2"></i>Panel del Profesor</h2>
-            <button class="btn btn-danger fw-bold shadow" onclick="closeClass()"><i class="bi bi-power me-1"></i> Finalizar Clase</button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm fw-bold" onclick="adminLogout()"><i class="bi bi-box-arrow-left me-1"></i> Salir</button>
+                <button class="btn btn-danger fw-bold shadow-sm" onclick="closeClass()"><i class="bi bi-power me-1"></i> Finalizar Clase</button>
+            </div>
         </div>
 
         <div class="row">
@@ -246,9 +249,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        setInterval(() => {
-            if (document.getElementById('admin-content').style.display === 'block') loadStatus();
-        }, 10000);
+        let adminToken = sessionStorage.getItem('adminToken') || '';
+
+        // Helper para escapar HTML en el frontend y prevenir XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Helper centralizado para peticiones autenticadas
+        async function adminFetch(url, options = {}) {
+            options.headers = options.headers || {};
+            if (adminToken) {
+                if (options.headers instanceof Headers) {
+                    options.headers.set('Authorization', `Bearer ${adminToken}`);
+                } else {
+                    options.headers['Authorization'] = `Bearer ${adminToken}`;
+                }
+            }
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                adminLogout();
+            }
+            return res;
+        }
 
         function togglePassword() {
             const passInput = document.getElementById('admin-pass');
@@ -262,23 +288,52 @@
             }
         }
 
-        function adminLogin() {
-            const user = document.getElementById('admin-user').value.trim().toLowerCase();
-            const pass = document.getElementById('admin-pass').value.trim().toLowerCase();
-            if (user === 'profesorcito' && (pass === 'edu.25694050' || pass === 'edu.25694050.')) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-                loadStatus();
-            } else {
-                const err = document.getElementById('admin-error');
-                err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 3000);
+        async function adminLogin() {
+            const user = document.getElementById('admin-user').value.trim();
+            const pass = document.getElementById('admin-pass').value.trim();
+            if (!user || !pass) return alert('Por favor ingresa usuario y contraseña.');
+
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user, pass })
+                });
+                const data = await res.json();
+                if (res.ok && data.token) {
+                    adminToken = data.token;
+                    sessionStorage.setItem('adminToken', adminToken);
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('admin-content').style.display = 'block';
+                    loadStatus();
+                } else {
+                    const err = document.getElementById('admin-error');
+                    err.innerText = data.error || 'Credenciales incorrectas';
+                    err.style.display = 'block';
+                    setTimeout(() => err.style.display = 'none', 3000);
+                }
+            } catch (e) {
+                alert('Error de conexión con el servidor.');
+            } finally {
+                btn.disabled = false;
             }
         }
 
+        function adminLogout() {
+            adminToken = '';
+            sessionStorage.removeItem('adminToken');
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('admin-content').style.display = 'none';
+        }
+
         async function loadStatus() {
+            if (!adminToken) return;
             try {
-                // EVITAMOS CACHÉ DEL NAVEGADOR
-                const res = await fetch(`/api/admin/status?_t=${Date.now()}`, { cache: 'no-store' });
+                const res = await adminFetch(`/api/admin/status?_t=${Date.now()}`, { cache: 'no-store' });
+                if (!res.ok) return;
                 const data = await res.json();
                 
                 renderTokens(data.activeTokens);
@@ -312,7 +367,7 @@
                 }
 
                 if (document.getElementById('snippet-text').getAttribute('data-loaded') !== 'true') {
-                    document.getElementById('snippet-text').value = data.snippet;
+                    document.getElementById('snippet-text').value = data.snippet || '';
                     document.getElementById('snippet-text').setAttribute('data-loaded', 'true');
                 }
 
@@ -329,7 +384,7 @@
                         const pct = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
                         bars.innerHTML += `
                             <div class="mb-1 small d-flex justify-content-between">
-                                <span>${opt.text}</span> <strong>${pct}% (${opt.votes})</strong>
+                                <span>${escapeHTML(opt.text)}</span> <strong>${pct}% (${opt.votes})</strong>
                             </div>
                             <div class="progress mb-2" style="height: 10px;">
                                 <div class="progress-bar bg-info" style="width: ${pct}%"></div>
@@ -346,17 +401,17 @@
 
         async function setLimit() {
             const size = document.getElementById('file-limit-select').value;
-            await fetch('/api/admin/limit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sizeMB: size }) });
+            await adminFetch('/api/admin/limit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sizeMB: size }) });
         }
 
         async function sendSnippet() {
             const text = document.getElementById('snippet-text').value;
-            await fetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+            await adminFetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
         }
 
         async function clearSnippet() {
             document.getElementById('snippet-text').value = '';
-            await fetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: '' }) });
+            await adminFetch('/api/admin/snippet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: '' }) });
         }
 
         async function startPoll() {
@@ -372,95 +427,198 @@
             if (o3) options.push(o3);
             if (o4) options.push(o4);
 
-            await fetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'start', question: q, options }) });
+            await adminFetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'start', question: q, options }) });
             loadStatus();
         }
 
         async function stopPoll() {
-            await fetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stop' }) });
+            await adminFetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stop' }) });
             loadStatus();
         }
 
         async function toggleLock() { 
-            await fetch('/api/admin/toggle-lock', { method: 'POST' }); 
+            await adminFetch('/api/admin/toggle-lock', { method: 'POST' }); 
             loadStatus(); 
         }
+
         async function startTimer() {
             const mins = parseInt(document.getElementById('timer-minutes').value);
             if (!mins || mins <= 0) return alert('Ingresa un tiempo válido');
-            await fetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: mins }) });
-            document.getElementById('timer-minutes').value = ''; loadStatus();
+            await adminFetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: mins }) });
+            document.getElementById('timer-minutes').value = ''; 
+            loadStatus();
         }
-        async function stopTimer() { await fetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: 0 }) }); loadStatus(); }
+
+        async function stopTimer() { 
+            await adminFetch('/api/admin/timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: 0 }) }); 
+            loadStatus(); 
+        }
+
         async function sendAnnouncement() {
             const msg = document.getElementById('announce-text').value.trim();
             if (!msg) return;
-            await fetch('/api/admin/announce', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
+            await adminFetch('/api/admin/announce', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
             document.getElementById('announce-text').value = '';
         }
 
-        async function resolveQuestion(id) { await fetch('/api/admin/delete-question', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); loadStatus(); }
+        async function resolveQuestion(id) { 
+            await adminFetch('/api/admin/delete-question', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); 
+            loadStatus(); 
+        }
+
         function renderQuestions(questions) {
             const list = document.getElementById('questions-list');
             if (!questions || questions.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">No hay dudas.</li>';
             list.innerHTML = '';
-            questions.forEach(q => list.innerHTML += `<li class="list-group-item bg-transparent py-2 px-1 border-bottom"><div class="d-flex justify-content-between align-items-center"><div><strong class="text-info small"><i class="bi bi-person-fill"></i> ${q.name}</strong> <span class="small d-block text-muted mt-1">${q.text}</span></div><button class="btn btn-sm btn-outline-success ms-2 p-1 py-0" onclick="resolveQuestion('${q.id}')" title="Marcar como resuelta"><i class="bi bi-check2"></i></button></div></li>`);
-        }
-        function renderTokens(tokens) { document.getElementById('tokens-list').innerHTML = tokens.length === 0 ? '<li class="list-group-item text-muted text-center p-1">Ninguna</li>' : tokens.map(t => `<li class="list-group-item fw-bold text-center text-success fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`).join(''); }
-        function renderUploadTokens(tokens) { document.getElementById('upload-tokens-list').innerHTML = tokens.length === 0 ? '<li class="list-group-item text-muted text-center p-1">Ninguno</li>' : tokens.map(t => `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary p-1">${t}</li>`).join(''); }
-        function renderSubmissions(submissions) {
-            window.currentSubmissions = submissions;
-            const list = document.getElementById("submissions-list");
-            if (submissions.length === 0) return list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
-            list.innerHTML = "";
-            [...submissions].reverse().forEach(s => {
-                list.innerHTML += `<li class="list-group-item py-2"><div class="d-flex w-100 justify-content-between align-items-center"><div class="d-flex align-items-center flex-grow-1 overflow-hidden"><input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}"><div class="text-truncate" title="${s.title}"><h6 class="mb-0"><i class="bi bi-file-earmark-text text-secondary me-1"></i> ${s.title}</h6><small class="text-muted"><i class="bi bi-person me-1"></i> ${s.name} (${s.grade})</small></div></div><a href="/api/admin/download-submission/${s.id}" class="btn btn-sm btn-success text-nowrap ms-2" title="Descargar"><i class="bi bi-download"></i></a></div></li>`;
+            questions.forEach(q => {
+                list.innerHTML += `
+                    <li class="list-group-item bg-transparent py-2 px-1 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-info small"><i class="bi bi-person-fill"></i> ${escapeHTML(q.name)}</strong> 
+                                <span class="small d-block text-muted mt-1">${escapeHTML(q.text)}</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success ms-2 p-1 py-0" onclick="resolveQuestion('${q.id}')" title="Marcar como resuelta"><i class="bi bi-check2"></i></button>
+                        </div>
+                    </li>`;
             });
         }
+
+        function renderTokens(tokens) { 
+            document.getElementById('tokens-list').innerHTML = (!tokens || tokens.length === 0) 
+                ? '<li class="list-group-item text-muted text-center p-1">Ninguna</li>' 
+                : tokens.map(t => `<li class="list-group-item fw-bold text-center text-success fs-5 letter-spacing-1 bg-body-secondary p-1">${escapeHTML(t)}</li>`).join(''); 
+        }
+
+        function renderUploadTokens(tokens) { 
+            document.getElementById('upload-tokens-list').innerHTML = (!tokens || tokens.length === 0) 
+                ? '<li class="list-group-item text-muted text-center p-1">Ninguno</li>' 
+                : tokens.map(t => `<li class="list-group-item fw-bold text-center text-warning fs-5 letter-spacing-1 bg-body-secondary p-1">${escapeHTML(t)}</li>`).join(''); 
+        }
+
+        function renderSubmissions(submissions) {
+            window.currentSubmissions = submissions || [];
+            const list = document.getElementById("submissions-list");
+            if (!submissions || submissions.length === 0) return list.innerHTML = "<li class=\"list-group-item text-muted text-center py-4 bg-body-secondary border-dashed\">No hay trabajos recibidos.</li>";
+            list.innerHTML = "";
+            [...submissions].reverse().forEach(s => {
+                list.innerHTML += `
+                    <li class="list-group-item py-2">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                                <input class="form-check-input me-3 submission-checkbox" type="checkbox" value="${s.id}">
+                                <div class="text-truncate" title="${escapeHTML(s.title)}">
+                                    <h6 class="mb-0"><i class="bi bi-file-earmark-text text-secondary me-1"></i> ${escapeHTML(s.title)}</h6>
+                                    <small class="text-muted"><i class="bi bi-person me-1"></i> ${escapeHTML(s.name)} (${escapeHTML(s.grade)})</small>
+                                </div>
+                            </div>
+                            <a href="/api/admin/download-submission/${s.id}?adminToken=${encodeURIComponent(adminToken)}" class="btn btn-sm btn-success text-nowrap ms-2" title="Descargar"><i class="bi bi-download"></i></a>
+                        </div>
+                    </li>`;
+            });
+        }
+
         function downloadAllSubmissions() {
             if (!window.currentSubmissions || window.currentSubmissions.length === 0) return alert("No hay trabajos para descargar.");
             const grado = prompt("Grado (Ej. 5to_Secundaria):"); if (!grado) return;
             const colegio = prompt("Nombre del colegio:"); if (!colegio) return;
-            window.location.href = `/api/admin/download-zip?grado=${encodeURIComponent(grado)}&colegio=${encodeURIComponent(colegio)}`;
+            window.location.href = `/api/admin/download-zip?grado=${encodeURIComponent(grado)}&colegio=${encodeURIComponent(colegio)}&adminToken=${encodeURIComponent(adminToken)}`;
         }
+
         async function deleteSelectedSubmissions() {
             const checkboxes = document.querySelectorAll(".submission-checkbox:checked");
             const ids = Array.from(checkboxes).map(cb => cb.value);
             if (ids.length === 0 || !confirm(`¿Eliminar ${ids.length} archivo(s)?`)) return;
-            await fetch("/api/admin/delete-submissions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
+            await adminFetch("/api/admin/delete-submissions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
             loadStatus();
         }
+
         function renderMaterials(materials) {
             const list = document.getElementById('materials-list');
-            if (materials.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>';
-            list.innerHTML = materials.map(m => `<li class="list-group-item py-2 bg-transparent px-1 border-bottom"><div class="d-flex w-100 justify-content-between align-items-center"><h6 class="mb-0 text-truncate pe-2 small"><i class="bi ${m.type === 'link' ? 'bi-link-45deg text-primary' : 'bi-file-earmark-arrow-down text-success'} fs-5 me-1"></i> ${m.title}</h6><span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase" style="font-size:0.6rem;">${m.type}</span></div></li>`).join('');
+            if (!materials || materials.length === 0) return list.innerHTML = '<li class="list-group-item text-muted text-center py-2 bg-transparent border-dashed small">La pizarra está vacía.</li>';
+            list.innerHTML = materials.map(m => `
+                <li class="list-group-item py-2 bg-transparent px-1 border-bottom">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h6 class="mb-0 text-truncate pe-2 small">
+                            <i class="bi ${m.type === 'link' ? 'bi-link-45deg text-primary' : 'bi-file-earmark-arrow-down text-success'} fs-5 me-1"></i> 
+                            ${escapeHTML(m.title)}
+                        </h6>
+                        <span class="badge ${m.type === 'link' ? 'bg-primary' : 'bg-success'} rounded-pill text-uppercase" style="font-size:0.6rem;">${escapeHTML(m.type)}</span>
+                    </div>
+                </li>
+            `).join('');
         }
         
-        async function generateToken() { await fetch('/api/admin/token', { method: 'POST' }); loadStatus(); }
+        async function generateToken() { 
+            await adminFetch('/api/admin/token', { method: 'POST' }); 
+            loadStatus(); 
+        }
+
         async function generateUploadToken() { 
-            const res = await fetch('/api/admin/upload-token', { method: 'POST' }); 
+            const res = await adminFetch('/api/admin/upload-token', { method: 'POST' }); 
             const data = await res.json();
             if (data.error) alert(data.error);
             loadStatus(); 
         }
+
         async function shareLink() {
-            const title = document.getElementById('link-title').value; const url = document.getElementById('link-url').value;
-            if (!title || !url) return;
-            await fetch('/api/admin/material', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'link', title, url }) });
-            document.getElementById('link-title').value = ''; document.getElementById('link-url').value = ''; loadStatus();
+            const title = document.getElementById('link-title').value.trim(); 
+            const url = document.getElementById('link-url').value.trim();
+            if (!title || !url) return alert('Completa el título y la URL');
+            await adminFetch('/api/admin/material', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'link', title, url }) });
+            document.getElementById('link-title').value = ''; 
+            document.getElementById('link-url').value = ''; 
+            loadStatus();
         }
+
+        // Corrección del endpoint y payload de subida de material
         async function uploadFile() {
             const fileInput = document.getElementById('file-upload');
-            if (fileInput.files.length === 0) return;
-            const formData = new FormData(); formData.append('file', fileInput.files[0]);
-            document.getElementById('btn-upload-file').disabled = true;
-            await fetch('/api/admin/upload', { method: 'POST', body: formData });
-            fileInput.value = ''; document.getElementById('btn-upload-file').disabled = false; loadStatus();
+            if (fileInput.files.length === 0) return alert('Selecciona un archivo.');
+            
+            const file = fileInput.files[0];
+            const formData = new FormData(); 
+            formData.append('type', 'file');
+            formData.append('title', file.name);
+            formData.append('file', file);
+            
+            const btn = document.getElementById('btn-upload-file');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Subiendo...';
+
+            try {
+                const res = await adminFetch('/api/admin/material', { method: 'POST', body: formData });
+                if (!res.ok) {
+                    const data = await res.json();
+                    alert(data.error || 'Error al subir archivo.');
+                }
+                fileInput.value = ''; 
+                loadStatus();
+            } catch (e) {
+                alert('Error al subir archivo.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-1"></i> Subir';
+            }
         }
+
         async function closeClass() {
             if (!confirm('🛑 ATENCIÓN: ¿Seguro que quieres cerrar la clase? Se borrará TODO permanentemente.')) return;
-            await fetch('/api/admin/close', { method: 'POST' }); alert('Clase finalizada.'); loadStatus();
+            await adminFetch('/api/admin/close', { method: 'POST' }); 
+            alert('Clase finalizada.'); 
+            loadStatus();
         }
+
+        // Si ya hay token guardado en sesión, ingresar automáticamente
+        if (adminToken) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            loadStatus();
+        }
+
+        setInterval(() => {
+            if (document.getElementById('admin-content').style.display === 'block') loadStatus();
+        }, 10000);
     </script>
 </body>
 </html>

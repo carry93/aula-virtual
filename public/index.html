@@ -122,18 +122,12 @@
             <!-- SECCIÓN LOGUEADO -->
             <div id="materials-section" style="display: none;">
                 
-                <!-- Tokens -->
+                <!-- Token de Acceso -->
                 <div class="row text-center mb-4 g-2">
-                    <div class="col-6">
+                    <div class="col-12">
                         <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase</small>
+                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase Actual</small>
                             <span class="fs-4 fw-bold" id="display-access-token">---</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-2 bg-warning rounded text-dark shadow-sm border border-warning">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-ticket-detailed-fill me-1"></i> Código de Envío</small>
-                            <span class="fs-4 fw-bold" id="display-upload-token">---</span>
                         </div>
                     </div>
                 </div>
@@ -182,7 +176,7 @@
                         </div>
                         <div class="input-group mb-2">
                             <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
-                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío" style="text-transform: uppercase;">
+                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío (Proporcionado por el docente)" style="text-transform: uppercase;">
                         </div>
                         
                         <div class="input-group mt-3">
@@ -213,11 +207,6 @@
         </div>
 
         <footer class="mt-2 mb-3 text-center text-muted small">
-            <div class="mb-2 d-flex justify-content-center gap-3">
-                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="text-decoration-none text-muted">Privacidad</a>
-                <span class="text-muted">|</span>
-                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none text-muted">Términos</a>
-            </div>
             &copy; 2026 Aula Virtual (v3.0). Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
         </footer>
     </div>
@@ -261,6 +250,13 @@
         let blinkInterval = null;
         const originalTitle = document.title;
         
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
         function triggerTabBlinking(msg) {
             if (!document.hidden || blinkInterval) return;
             let showMsg = true;
@@ -283,7 +279,11 @@
             if (!token) return alert("Por favor ingresa un token.");
 
             try {
-                const res = await fetch("/api/student/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+                const res = await fetch("/api/student/login", { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify({ token }) 
+                });
                 if (res.ok) {
                     currentToken = token;
                     document.getElementById("login-section").style.display = "none";
@@ -300,7 +300,7 @@
 
         function logout() {
             currentToken = "";
-            if(refreshInterval) clearInterval(refreshInterval);
+            if (refreshInterval) clearInterval(refreshInterval);
             location.reload();
         }
 
@@ -322,7 +322,6 @@
         async function loadMaterials() {
             if (!currentToken) return;
             try {
-                // CACHE KILLER DEFINITIVO
                 const res = await fetch(`/api/student/materials?_t=${Date.now()}`, { 
                     headers: { "Authorization": currentToken },
                     cache: "no-store" 
@@ -332,7 +331,6 @@
                 const data = await res.json();
                 
                 document.getElementById("display-access-token").innerText = currentToken;
-                document.getElementById("display-upload-token").innerText = (data.uploadTokens && data.uploadTokens.length > 0) ? data.uploadTokens[data.uploadTokens.length - 1] : "---";
 
                 let shouldBlink = false;
                 let blinkMessage = "🔴 ¡NUEVO AVISO!";
@@ -356,7 +354,7 @@
                     localTimerRemaining = null;
                 }
 
-                // LÓGICA DE BLOQUEO BLINDADA
+                // Lógica de bloqueo
                 if (data.locked === true) {
                     applyLockState(true, "El profesor ha pausado las entregas momentáneamente.");
                 } else if (localTimerRemaining !== null && localTimerRemaining <= 0) {
@@ -396,7 +394,7 @@
                             const pct = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
                             pollOps.innerHTML += `
                                 <div class="text-dark small d-flex justify-content-between mb-1">
-                                    <span>${opt.text}</span> <strong>${pct}%</strong>
+                                    <span>${escapeHTML(opt.text)}</span> <strong>${pct}%</strong>
                                 </div>
                                 <div class="progress mb-2" style="height: 15px;">
                                     <div class="progress-bar bg-info text-dark fw-bold" style="width: ${pct}%"></div>
@@ -404,7 +402,7 @@
                         });
                     } else {
                         data.poll.options.forEach((opt, idx) => {
-                            pollOps.innerHTML += `<button class="btn btn-outline-dark fw-bold text-start" onclick="votePoll('${data.poll.id}', ${idx})"><i class="bi bi-circle me-2"></i> ${opt.text}</button>`;
+                            pollOps.innerHTML += `<button class="btn btn-outline-dark fw-bold text-start" onclick="votePoll('${data.poll.id}', ${idx})"><i class="bi bi-circle me-2"></i> ${escapeHTML(opt.text)}</button>`;
                         });
                     }
                 } else {
@@ -420,12 +418,15 @@
                 lastMaterialCount = data.materials.length;
 
                 const list = document.getElementById("materials-list");
-                if (data.materials.length === 0) list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">Ningún material.</li>";
+                if (data.materials.length === 0) list.innerHTML = "<li class=\"list-group-item text-muted text-center bg-transparent border-secondary\">Ningún material disponible.</li>";
                 else {
                     list.innerHTML = "";
                     data.materials.forEach(m => {
-                        if (m.type === "link") list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${m.url}" target="_blank" class="text-decoration-none fw-bold text-info"><i class="bi bi-link-45deg fs-5 me-1"></i> ${m.title}</a></li>`;
-                        else list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${m.title}"><i class="bi bi-file-earmark-arrow-down fs-5 me-1 text-success"></i> ${m.title}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary" title="Descargar"><i class="bi bi-download"></i></a></li>`;
+                        if (m.type === "link") {
+                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary"><a href="${encodeURI(m.url)}" target="_blank" rel="noopener noreferrer" class="text-decoration-none fw-bold text-info"><i class="bi bi-link-45deg fs-5 me-1"></i> ${escapeHTML(m.title)}</a></li>`;
+                        } else {
+                            list.innerHTML += `<li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center"><span class="text-truncate pe-3 text-white" title="${escapeHTML(m.title)}"><i class="bi bi-file-earmark-arrow-down fs-5 me-1 text-success"></i> ${escapeHTML(m.title)}</span><a href="/api/download/${m.id}?token=${currentToken}" class="btn btn-sm btn-primary" title="Descargar"><i class="bi bi-download"></i></a></li>`;
+                        }
                     });
                 }
                 
@@ -434,7 +435,9 @@
                 else {
                     subList.innerHTML = "";
                     const lastFive = data.submissions.slice(-5).reverse();
-                    lastFive.forEach(s => subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary"><i class="bi bi-file-earmark-check text-success me-2"></i> ${s.title}</li>`);
+                    lastFive.forEach(s => {
+                        subList.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary"><i class="bi bi-file-earmark-check text-success me-2"></i> ${escapeHTML(s.title)}</li>`;
+                    });
                 }
 
                 if (shouldBlink && !isFirstLoad) triggerTabBlinking(blinkMessage);
@@ -445,7 +448,11 @@
 
         async function votePoll(pollId, index) {
             try {
-                await fetch("/api/student/vote", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken }, body: JSON.stringify({ pollId, optionIndex: index }) });
+                await fetch("/api/student/vote", { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "Authorization": currentToken }, 
+                    body: JSON.stringify({ pollId, optionIndex: index }) 
+                });
                 localStorage.setItem('voted_' + pollId, 'true');
                 loadMaterials();
             } catch (e) { alert("Error al votar"); }
@@ -467,12 +474,9 @@
                 display.innerText = "¡SE TERMINÓ EL TIEMPO!";
                 display.style.fontSize = "2.5rem";
                 display.style.animation = "none";
-                
-                // Aplicar el bloqueo de forma garantizada
                 applyLockState(true, "¡El tiempo para entregar se ha agotado!");
             } else {
                 localTimerRemaining--; 
-                
                 title.style.display = 'inline-block';
                 display.style.fontSize = "3rem";
                 const m = Math.floor(localTimerRemaining / 60).toString().padStart(2, '0');
@@ -484,7 +488,6 @@
             }
         }
         
-        // Llamar a la actualización local cada 1 segundo
         setInterval(updateLocalTimer, 1000);
 
         async function submitWork() {
@@ -507,7 +510,8 @@
             formData.append("file", fileInput.files[0]);
 
             const btn = document.getElementById("btn-submit");
-            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Enviando...';
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Enviando...';
             
             try {
                 const res = await fetch("/api/student/upload", { method: "POST", body: formData });
@@ -515,16 +519,23 @@
                 msgEl.style.display = "block";
                 
                 if (res.ok) {
-                    msgEl.className = "mt-2 text-center text-success fw-bold"; msgEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Trabajo enviado!';
-                    fileInput.value = ""; loadMaterials(); 
+                    msgEl.className = "mt-2 text-center text-success fw-bold"; 
+                    msgEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Trabajo enviado!';
+                    fileInput.value = ""; 
+                    loadMaterials(); 
                 } else {
-                    msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> ${data.error || "Error al enviar."}`;
+                    msgEl.className = "mt-2 text-center text-danger fw-bold"; 
+                    msgEl.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> ${escapeHTML(data.error || "Error al enviar.")}`;
                 }
             } catch (e) {
-                msgEl.style.display = "block"; msgEl.className = "mt-2 text-center text-danger fw-bold"; msgEl.innerHTML = '<i class="bi bi-wifi-off me-1"></i> Error de conexión.';
+                msgEl.style.display = "block"; 
+                msgEl.className = "mt-2 text-center text-danger fw-bold"; 
+                msgEl.innerHTML = '<i class="bi bi-wifi-off me-1"></i> Error de conexión.';
+            } finally {
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar Trabajo';
+                setTimeout(() => msgEl.style.display = "none", 5000);
             }
-            btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar Trabajo';
-            setTimeout(() => msgEl.style.display = "none", 5000);
         }
 
         async function submitQuestion() {
@@ -533,7 +544,11 @@
             if (!text) return alert("Escribe una pregunta");
 
             try {
-                await fetch("/api/student/question", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": currentToken }, body: JSON.stringify({ name, text }) });
+                await fetch("/api/student/question", { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "Authorization": currentToken }, 
+                    body: JSON.stringify({ name, text }) 
+                });
                 document.getElementById("q-text").value = "";
                 document.getElementById("q-msg").style.display = "block";
                 setTimeout(() => {
