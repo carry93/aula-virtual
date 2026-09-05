@@ -89,11 +89,6 @@
                     <div class="card-body">
                         <h5 class="text-secondary mb-3"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Controles en Vivo</h5>
                         
-                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-body-secondary rounded">
-                            <span class="fw-bold" id="lock-status-text">Entregas Habilitadas</span>
-                            <button id="btn-toggle-lock" class="btn btn-sm btn-outline-danger" onclick="toggleLock()"><i class="bi bi-pause-circle me-1"></i> Pausar</button>
-                        </div>
-                        
                         <div class="input-group mb-3">
                             <span class="input-group-text"><i class="bi bi-stopwatch"></i></span>
                             <input type="number" id="timer-minutes" class="form-control" placeholder="Minutos" min="1">
@@ -355,17 +350,6 @@
                     else document.getElementById('storage-bar').className = 'progress-bar bg-success';
                 }
 
-                // Lock Status
-                const lockBtn = document.getElementById('btn-toggle-lock');
-                const lockTxt = document.getElementById('lock-status-text');
-                if (data.locked) {
-                    lockBtn.className = 'btn btn-sm btn-success'; lockBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Reanudar';
-                    lockTxt.innerText = 'Entregas Pausadas'; lockTxt.className = 'fw-bold text-danger';
-                } else {
-                    lockBtn.className = 'btn btn-sm btn-outline-danger'; lockBtn.innerHTML = '<i class="bi bi-pause-circle me-1"></i> Pausar';
-                    lockTxt.innerText = 'Entregas Habilitadas'; lockTxt.className = 'fw-bold text-success';
-                }
-
                 if (document.getElementById('snippet-text').getAttribute('data-loaded') !== 'true') {
                     document.getElementById('snippet-text').value = data.snippet || '';
                     document.getElementById('snippet-text').setAttribute('data-loaded', 'true');
@@ -434,11 +418,6 @@
         async function stopPoll() {
             await adminFetch('/api/admin/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stop' }) });
             loadStatus();
-        }
-
-        async function toggleLock() { 
-            await adminFetch('/api/admin/toggle-lock', { method: 'POST' }); 
-            loadStatus(); 
         }
 
         async function startTimer() {
@@ -571,7 +550,6 @@
             loadStatus();
         }
 
-        // Corrección del endpoint y payload de subida de material
         async function uploadFile() {
             const fileInput = document.getElementById('file-upload');
             if (fileInput.files.length === 0) return alert('Selecciona un archivo.');

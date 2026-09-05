@@ -157,13 +157,6 @@
 
                 <!-- ENVIAR TRABAJO -->
                 <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative shadow">
-                    
-                    <div id="lock-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10; border-radius:inherit; backdrop-filter: blur(3px);" class="d-flex flex-column justify-content-center align-items-center text-center p-4">
-                        <i class="bi bi-lock-fill text-danger mb-2" style="font-size: 4rem;"></i>
-                        <h4 class="text-danger fw-bold">ENTREGAS PAUSADAS</h4>
-                        <p class="text-white small mb-0" id="lock-reason">El profesor ha pausado las entregas momentáneamente.</p>
-                    </div>
-
                     <h5 class="text-secondary mb-3"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
                     <div class="mb-2">
                         <div class="input-group mb-2">
@@ -304,21 +297,6 @@
             location.reload();
         }
 
-        function applyLockState(isLocked, reasonText) {
-            const overlay = document.getElementById('lock-overlay');
-            const reason = document.getElementById('lock-reason');
-            const formElements = ['student-name', 'student-grade', 'upload-token', 'upload-file', 'btn-submit'];
-            
-            if (isLocked) {
-                overlay.style.display = 'flex';
-                reason.innerText = reasonText;
-                formElements.forEach(id => document.getElementById(id).disabled = true);
-            } else {
-                overlay.style.display = 'none';
-                formElements.forEach(id => document.getElementById(id).disabled = false);
-            }
-        }
-
         async function loadMaterials() {
             if (!currentToken) return;
             try {
@@ -352,15 +330,6 @@
                     localTimerRemaining = data.timerRemaining;
                 } else {
                     localTimerRemaining = null;
-                }
-
-                // Lógica de bloqueo
-                if (data.locked === true) {
-                    applyLockState(true, "El profesor ha pausado las entregas momentáneamente.");
-                } else if (localTimerRemaining !== null && localTimerRemaining <= 0) {
-                    applyLockState(true, "¡El tiempo para entregar se ha agotado!");
-                } else {
-                    applyLockState(false, "");
                 }
 
                 if (data.snippet && data.snippet !== lastSnippet) {
@@ -474,7 +443,6 @@
                 display.innerText = "¡SE TERMINÓ EL TIEMPO!";
                 display.style.fontSize = "2.5rem";
                 display.style.animation = "none";
-                applyLockState(true, "¡El tiempo para entregar se ha agotado!");
             } else {
                 localTimerRemaining--; 
                 title.style.display = 'inline-block';
