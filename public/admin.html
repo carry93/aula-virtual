@@ -236,7 +236,26 @@
         </div>
         
         <footer class="mt-5 mb-3 text-center text-muted small">
-            &copy; 2026 Aula Virtual (v3.0). Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-2">
+                <a href="/" class="text-decoration-none text-muted">Inicio</a>
+                <span>•</span>
+                <a href="/guias-docentes.html" class="text-decoration-none text-muted">Guías Docentes</a>
+                <span>•</span>
+                <a href="/recursos-estudiantes.html" class="text-decoration-none text-muted">Recursos</a>
+                <span>•</span>
+                <a href="/faq.html" class="text-decoration-none text-muted">Preguntas Frecuentes</a>
+                <span>•</span>
+                <a href="/privacidad.html" class="text-decoration-none text-muted">Política de Privacidad</a>
+                <span>•</span>
+                <a href="/terminos.html" class="text-decoration-none text-muted">Términos</a>
+                <span>•</span>
+                <a href="/cookies.html" class="text-decoration-none text-muted">Cookies</a>
+                <span>•</span>
+                <a href="/sobre-nosotros.html" class="text-decoration-none text-muted">Sobre Nosotros</a>
+                <span>•</span>
+                <a href="/contacto.html" class="text-decoration-none text-muted">Contacto</a>
+            </div>
+            &copy; 2026 <strong>compuclase.click</strong> - Plataforma de Aula Virtual. Desarrollado por <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>.
         </footer>
     </div>
 
@@ -245,6 +264,7 @@
 
     <script>
         let adminToken = sessionStorage.getItem('adminToken') || '';
+        let isIntentionalExit = false;
 
         // Helper para escapar HTML en el frontend y prevenir XSS
         function escapeHTML(str) {
@@ -318,6 +338,7 @@
         }
 
         function adminLogout() {
+            isIntentionalExit = true;
             adminToken = '';
             sessionStorage.removeItem('adminToken');
             document.getElementById('login-screen').style.display = 'block';
@@ -582,9 +603,10 @@
 
         async function closeClass() {
             if (!confirm('🛑 ATENCIÓN: ¿Seguro que quieres cerrar la clase? Se borrará TODO permanentemente.')) return;
+            isIntentionalExit = true;
             await adminFetch('/api/admin/close', { method: 'POST' }); 
             alert('Clase finalizada.'); 
-            loadStatus();
+            adminLogout();
         }
 
         // Si ya hay token guardado en sesión, ingresar automáticamente
@@ -593,6 +615,27 @@
             document.getElementById('admin-content').style.display = 'block';
             loadStatus();
         }
+
+        // ADVERTENCIA AL CERRAR PESTAÑA Y FINALIZACIÓN AUTOMÁTICA DE CLASE
+        window.addEventListener('beforeunload', (e) => {
+            if (adminToken && !isIntentionalExit && document.getElementById('admin-content').style.display === 'block') {
+                e.preventDefault();
+                e.returnValue = '¿Estás seguro de que deseas salir? Al cerrar esta pestaña se finalizará la clase automáticamente.';
+                return e.returnValue;
+            }
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (adminToken && !isIntentionalExit && document.getElementById('admin-content').style.display === 'block') {
+                // Enviar cierre de clase con keepalive para asegurar ejecución al cerrar la pestaña
+                fetch(`/api/admin/close?adminToken=${encodeURIComponent(adminToken)}`, {
+                    method: 'POST',
+                    keepalive: true,
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                sessionStorage.removeItem('adminToken');
+            }
+        });
 
         setInterval(() => {
             if (document.getElementById('admin-content').style.display === 'block') loadStatus();

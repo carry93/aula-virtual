@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Aula Virtual compuclase.click - Plataforma educativa interactiva gratuita para estudiantes y docentes. Envío de tareas, descarga de materiales, y gestión de clases en tiempo real.">
-    <meta name="keywords" content="aula virtual, educación a distancia, colegio, profesores, estudiantes, clases virtuales, tareas, plataforma educativa, herramientas digitales">
-    <title>Aula Virtual - Estudiante</title>
+    <meta name="description" content="compuclase.click - Aula Virtual interactiva y gratuita para docentes y estudiantes de computación e informática. Entrega de tareas, pizarras de código en vivo, encuestas y descarga organizada en ZIP.">
+    <meta name="keywords" content="aula virtual, computacion, informatica, educacion digital, clases virtuales, tareas, plataforma educativa, herramientas docentes, pizarra de codigo">
+    <title>compuclase.click - Aula Virtual Interactiva para Docentes y Estudiantes</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
     
+    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846167991984452" crossorigin="anonymous"></script>
     
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
         body { 
             margin: 0; padding: 0; overflow-x: hidden;
+            background: #0f172a;
             color: #f8f9fa;
         }
         
@@ -29,29 +30,42 @@
         }
         .bg-animated .square {
             position: absolute; bottom: -120px;
-            background: rgba(56, 189, 248, 0.05); 
-            border: 2px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+            background: rgba(56, 189, 248, 0.04); 
+            border: 1px solid rgba(56, 189, 248, 0.15);
             animation: floatUp linear infinite;
         }
-        .sq-1 { left: 10%; width: 80px; height: 80px; animation-duration: 15s; }
-        .sq-2 { left: 30%; width: 50px; height: 50px; animation-duration: 12s; animation-delay: 2s; }
-        .sq-3 { left: 60%; width: 120px; height: 120px; animation-duration: 22s; }
-        .sq-4 { left: 85%; width: 60px; height: 60px; animation-duration: 14s; animation-delay: 5s; }
-        .sq-5 { left: 45%; width: 40px; height: 40px; animation-duration: 10s; animation-delay: 1s; }
-        .sq-6 { left: 75%; width: 90px; height: 90px; animation-duration: 18s; animation-delay: 7s; }
-        .sq-7 { left: 20%; width: 70px; height: 70px; animation-duration: 16s; animation-delay: 4s; }
+        .sq-1 { left: 10%; width: 80px; height: 80px; animation-duration: 18s; }
+        .sq-2 { left: 30%; width: 50px; height: 50px; animation-duration: 14s; animation-delay: 2s; }
+        .sq-3 { left: 60%; width: 120px; height: 120px; animation-duration: 25s; }
+        .sq-4 { left: 85%; width: 60px; height: 60px; animation-duration: 16s; animation-delay: 5s; }
+        .sq-5 { left: 45%; width: 40px; height: 40px; animation-duration: 12s; animation-delay: 1s; }
+        .sq-6 { left: 75%; width: 90px; height: 90px; animation-duration: 20s; animation-delay: 7s; }
+        .sq-7 { left: 20%; width: 70px; height: 70px; animation-duration: 19s; animation-delay: 4s; }
         
         @keyframes floatUp {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
-        .card { 
-            background: rgba(15, 23, 42, 0.85) !important; 
+        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; }
+        
+        .card-classroom { 
+            background: rgba(15, 23, 42, 0.9) !important; 
             backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255,255,255,0.1) !important; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+        }
+
+        .card-feature {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .card-feature:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.4);
         }
 
         #timer-display {
@@ -62,6 +76,7 @@
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1050; display: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
+        footer { border-top: 1px solid rgba(255,255,255,0.1); background: #0b1120; }
     </style>
 </head>
 <body>
@@ -83,126 +98,348 @@
         <button type="button" class="btn-close btn-close-white float-end" onclick="document.getElementById('announcement-banner').style.display='none'"></button>
     </div>
 
-    <!-- Botón Duda -->
+    <!-- NAVBAR DE NAVEGACIÓN -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top border-bottom border-secondary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-primary d-flex align-items-center gap-2" href="/">
+                <span class="fs-4">🎓</span>
+                <span>compuclase<span class="text-white">.click</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2">
+                    <li class="nav-item"><a class="nav-link active text-primary fw-bold" href="/"><i class="bi bi-house-door me-1"></i> Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/guias-docentes.html"><i class="bi bi-journal-bookmark me-1"></i> Guías Docentes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/recursos-estudiantes.html"><i class="bi bi-backpack me-1"></i> Recursos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/faq.html"><i class="bi bi-question-circle me-1"></i> FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sobre-nosotros.html"><i class="bi bi-info-circle me-1"></i> Sobre Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contacto.html"><i class="bi bi-envelope me-1"></i> Contacto</a></li>
+                    <li class="nav-item ms-lg-2"><a class="btn btn-sm btn-primary fw-bold" href="/admin.html"><i class="bi bi-person-badge-fill me-1"></i> Acceso Docente</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Botón Duda Flotante -->
     <button id="btn-duda" class="btn btn-info btn-lg rounded-circle shadow-lg text-white d-flex justify-content-center align-items-center" 
             style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: none; width: 60px; height: 60px; font-size: 28px;" 
             data-bs-toggle="modal" data-bs-target="#questionModal" title="Tengo una duda">
         <i class="bi bi-person-raised-hand"></i>
     </button>
 
-    <div class="container mt-5" style="max-width: 650px;">
-        
-        <!-- Contenedor del Reloj -->
-        <div id="timer-container" class="mb-3 text-center" style="display: none;">
-            <div id="timer-title" class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
-            <div id="timer-display" class="text-danger">00:00</div>
-        </div>
-
-        <div class="card shadow-sm text-center p-4 mb-4">
-            <h2 class="mb-1 text-muted fs-4">Aula Virtual</h2>
-            <h1 class="mb-4 fw-bold text-white display-5">compuclase.click</h1>
-
-            <!-- SECCIÓN LOGIN -->
-            <div id="login-section">
-                <div class="alert alert-primary text-start small mb-4 border-primary">
-                    <ol class="mb-0 ps-3">
-                        <li>Pídele a tu profesor la clave de la clase de hoy.</li>
-                        <li>Escríbela en la casilla que está abajo.</li>
-                        <li>Haz clic en "Ingresar a Clase".</li>
-                    </ol>
-                </div>
-                <div class="input-group mb-3">
-                    <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-key-fill"></i></span>
-                    <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold" placeholder="Clave de 6 letras" style="text-transform: uppercase;">
-                </div>
-                <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="login()"><i class="bi bi-box-arrow-in-right me-2"></i> Ingresar a Clase</button>
-                <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
-            </div>
-
-            <!-- SECCIÓN LOGUEADO -->
-            <div id="materials-section" style="display: none;">
+    <!-- HERO SECTION & AULA VIRTUAL -->
+    <div class="container my-5">
+        <div class="row align-items-center g-5">
+            
+            <!-- Columna Informativa Hero -->
+            <div class="col-lg-6 text-start">
+                <span class="badge bg-primary bg-opacity-25 text-info px-3 py-2 rounded-pill fw-bold mb-3 border border-primary border-opacity-25">
+                    <i class="bi bi-broadcast me-1"></i> Plataforma Educativa Interactiva
+                </span>
+                <h1 class="display-4 fw-bold text-white mb-3 leading-tight">
+                    El Aula Virtual Sincrónica para Clases de Computación
+                </h1>
+                <p class="lead text-light opacity-90 mb-4">
+                    Diseñada para docentes y estudiantes de tecnología. Comparte fragmentos de código en tiempo real, lanza encuestas evaluativas y recolecta tareas en un archivo ZIP organizado al instante.
+                </p>
                 
-                <!-- Token de Acceso -->
-                <div class="row text-center mb-4 g-2">
-                    <div class="col-12">
-                        <div class="p-2 bg-success rounded text-white shadow-sm border border-success">
-                            <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase Actual</small>
-                            <span class="fs-4 fw-bold" id="display-access-token">---</span>
-                        </div>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span class="small text-muted">Sin registros para alumnos</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span class="small text-muted">Archivos 100% efímeros</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span class="small text-muted">Reportes en Excel automáticos</span>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 border-secondary">
-                    <h4 class="mb-0 text-primary"><i class="bi bi-journal-text me-2"></i>Contenido de Clase</h4>
-                    <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-box-arrow-left me-1"></i> Salir</button>
+                <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-50 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-0 text-white fw-bold"><i class="bi bi-person-workspace text-primary me-2"></i>¿Eres profesor?</h6>
+                        <small class="text-muted">Inicia una clase interactiva en segundos</small>
+                    </div>
+                    <a href="/admin.html" class="btn btn-outline-primary btn-sm fw-bold">Panel del Profesor &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Columna del Aula (Formulario de Acceso y Sesión) -->
+            <div class="col-lg-6" id="aula-virtual">
+                
+                <!-- Contenedor del Reloj -->
+                <div id="timer-container" class="mb-3 text-center" style="display: none;">
+                    <div id="timer-title" class="badge bg-danger mb-1 fs-6"><i class="bi bi-hourglass-split me-1"></i> Tiempo restante</div>
+                    <div id="timer-display" class="text-danger">00:00</div>
                 </div>
 
-                <!-- ENCUESTA EN VIVO -->
-                <div id="poll-container" class="alert alert-warning text-start mb-4 border-warning shadow" style="display: none;">
-                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-bar-chart-steps me-2"></i> <span id="poll-question"></span></h5>
-                    <div id="poll-options" class="d-grid gap-2"></div>
-                </div>
-                
-                <!-- PIZARRA DE CÓDIGO -->
-                <div id="snippet-container" class="text-start mb-4 shadow" style="display: none;">
-                    <h5 class="text-secondary mb-2"><i class="bi bi-terminal me-2"></i> Pizarra del Profesor</h5>
-                    <pre class="bg-dark text-success p-3 rounded border border-secondary" style="white-space: pre-wrap; font-family: monospace;"><code id="snippet-display"></code></pre>
-                </div>
-                
-                <!-- MATERIALES -->
-                <div class="text-start mb-4">
-                    <h5 class="text-secondary mb-2"><i class="bi bi-folder-fill me-2"></i> Archivos y Enlaces</h5>
-                    <ul class="list-group shadow-sm" id="materials-list"></ul>
-                </div>
+                <div class="card card-classroom shadow-lg text-center p-4 rounded-4">
+                    <h2 class="mb-1 text-info fs-5 text-uppercase fw-bold"><i class="bi bi-mortarboard-fill me-2"></i>Ingreso de Estudiantes</h2>
+                    <p class="text-muted small mb-4">Conéctate a la clase en vivo con la clave proporcionada por tu docente</p>
 
-                <!-- ENVIAR TRABAJO -->
-                <div class="text-start bg-body-tertiary p-3 rounded border border-secondary position-relative shadow">
-                    <h5 class="text-secondary mb-3"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
-                    <div class="mb-2">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
-                            <input type="text" id="student-name" class="form-control" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
+                    <!-- SECCIÓN LOGIN -->
+                    <div id="login-section">
+                        <div class="alert alert-primary bg-primary bg-opacity-10 text-start small mb-4 border-primary border-opacity-25">
+                            <ol class="mb-0 ps-3">
+                                <li>Pídele a tu profesor la clave de la clase de hoy.</li>
+                                <li>Escríbela en la casilla que está abajo.</li>
+                                <li>Haz clic en "Ingresar a Clase".</li>
+                            </ol>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-mortarboard-fill text-secondary"></i></span>
-                            <input type="text" id="student-grade" class="form-control" placeholder="Tu Grado (Ej. 5to Secundaria)">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-key-fill"></i></span>
+                            <input type="text" id="token-input" class="form-control form-control-lg text-center fw-bold text-white bg-dark border-secondary" placeholder="Clave de 6 letras" style="text-transform: uppercase;">
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
-                            <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío (Proporcionado por el docente)" style="text-transform: uppercase;">
+                        <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="login()"><i class="bi bi-box-arrow-in-right me-2"></i> Ingresar a Clase</button>
+                        <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
+                    </div>
+
+                    <!-- SECCIÓN LOGUEADO -->
+                    <div id="materials-section" style="display: none;">
+                        
+                        <!-- Token de Acceso -->
+                        <div class="row text-center mb-4 g-2">
+                            <div class="col-12">
+                                <div class="p-2 bg-success bg-opacity-25 rounded text-white shadow-sm border border-success">
+                                    <small class="d-block text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;"><i class="bi bi-key-fill me-1"></i> Clave Clase Actual</small>
+                                    <span class="fs-4 fw-bold text-success" id="display-access-token">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 border-secondary">
+                            <h4 class="mb-0 text-primary fs-5"><i class="bi bi-journal-text me-2"></i>Contenido de Clase</h4>
+                            <button class="btn btn-sm btn-outline-danger" onclick="logout()"><i class="bi bi-box-arrow-left me-1"></i> Salir</button>
+                        </div>
+
+                        <!-- ENCUESTA EN VIVO -->
+                        <div id="poll-container" class="alert alert-warning text-start mb-4 border-warning shadow" style="display: none;">
+                            <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-bar-chart-steps me-2"></i> <span id="poll-question"></span></h5>
+                            <div id="poll-options" class="d-grid gap-2"></div>
                         </div>
                         
-                        <div class="input-group mt-3">
-                            <input type="file" id="upload-file" class="form-control">
+                        <!-- PIZARRA DE CÓDIGO -->
+                        <div id="snippet-container" class="text-start mb-4 shadow" style="display: none;">
+                            <h5 class="text-secondary mb-2 fs-6"><i class="bi bi-terminal me-2"></i> Pizarra del Profesor</h5>
+                            <pre class="bg-dark text-success p-3 rounded border border-secondary" style="white-space: pre-wrap; font-family: monospace;"><code id="snippet-display"></code></pre>
                         </div>
-                        <small class="text-muted" id="upload-limit-text"><i class="bi bi-info-circle me-1"></i> Límite por archivo: -- MB</small>
+                        
+                        <!-- MATERIALES -->
+                        <div class="text-start mb-4">
+                            <h5 class="text-secondary mb-2 fs-6"><i class="bi bi-folder-fill me-2"></i> Archivos y Enlaces</h5>
+                            <ul class="list-group shadow-sm" id="materials-list"></ul>
+                        </div>
+
+                        <!-- ENVIAR TRABAJO -->
+                        <div class="text-start bg-body-tertiary p-3 rounded-3 border border-secondary position-relative shadow">
+                            <h5 class="text-secondary mb-3 fs-6"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Enviar Tarea</h5>
+                            <div class="mb-2">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-dark border-secondary"><i class="bi bi-person-fill text-secondary"></i></span>
+                                    <input type="text" id="student-name" class="form-control" placeholder="Tu Nombre Completo (Ej. Juan Pérez)">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-dark border-secondary"><i class="bi bi-mortarboard-fill text-secondary"></i></span>
+                                    <input type="text" id="student-grade" class="form-control" placeholder="Tu Grado (Ej. 5to Secundaria)">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-dark border-secondary"><i class="bi bi-ticket-detailed text-secondary"></i></span>
+                                    <input type="text" id="upload-token" class="form-control" placeholder="Código de Envío (Dictado por el profesor)" style="text-transform: uppercase;">
+                                </div>
+                                
+                                <div class="input-group mt-3">
+                                    <input type="file" id="upload-file" class="form-control">
+                                </div>
+                                <small class="text-muted" id="upload-limit-text"><i class="bi bi-info-circle me-1"></i> Límite por archivo: -- MB</small>
+                            </div>
+                            <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()"><i class="bi bi-send-fill me-1"></i> Enviar Trabajo</button>
+                            <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
+                        </div>
+
+                        <!-- Trabajos Recibidos -->
+                        <div class="text-start p-3 mt-4">
+                            <h6 class="text-secondary mb-2 text-center small"><i class="bi bi-check2-all me-1"></i> Entregas Recientes</h6>
+                            <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
+                        </div>
                     </div>
-                    <button class="btn btn-warning w-100 fw-bold text-dark mt-2" id="btn-submit" onclick="submitWork()"><i class="bi bi-send-fill me-1"></i> Enviar Trabajo</button>
-                    <div id="upload-message" class="mt-2 text-center" style="display: none;"></div>
                 </div>
 
-                <!-- Trabajos Recibidos -->
-                <div class="text-start p-3 mt-4">
-                    <h6 class="text-secondary mb-2 text-center"><i class="bi bi-check2-all me-1"></i> Entregas Recientes</h6>
-                    <ul id="student-submissions-list" class="list-group list-group-flush mb-0 small bg-transparent text-center"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN CARACTERÍSTICAS Y VENTAJAS PEDAGÓGICAS -->
+    <div class="container my-5 py-4">
+        <div class="text-center mb-5" style="max-width: 750px; margin: auto;">
+            <span class="badge bg-info text-dark px-3 py-2 text-uppercase mb-2 fw-bold">Funcionalidades del Sistema</span>
+            <h2 class="display-6 fw-bold text-white">¿Por Qué Usar compuclase.click en Tu Laboratorio?</h2>
+            <p class="text-muted">Herramientas optimizadas para eliminar la fricción técnica y maximizar el tiempo de aprendizaje.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <div class="p-3 bg-primary bg-opacity-25 rounded-3 text-primary d-inline-block mb-3 fs-3 text-center" style="width: 55px; height: 55px;">
+                        <i class="bi bi-terminal"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Pizarra de Código</h5>
+                    <p class="small text-muted mb-0">Proyecta fragmentos limpios de HTML, CSS, JavaScript o comandos directamente en las pantallas de los estudiantes sin errores tipográficos.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <div class="p-3 bg-warning bg-opacity-25 rounded-3 text-warning d-inline-block mb-3 fs-3 text-center" style="width: 55px; height: 55px;">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Encuestas en Vivo</h5>
+                    <p class="small text-muted mb-0">Evalúa el nivel de comprensión del salón con votaciones instantáneas y gráficos porcentuales en tiempo real.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <div class="p-3 bg-success bg-opacity-25 rounded-3 text-success d-inline-block mb-3 fs-3 text-center" style="width: 55px; height: 55px;">
+                        <i class="bi bi-file-earmark-zip-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Descarga en ZIP + Excel</h5>
+                    <p class="small text-muted mb-0">Descarga todos los trabajos nombrados ordenadamente con grado y nombre del estudiante, junto a la planilla de registro de horas de entrega.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <div class="p-3 bg-danger bg-opacity-25 rounded-3 text-danger d-inline-block mb-3 fs-3 text-center" style="width: 55px; height: 55px;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">Privacidad Efímera</h5>
+                    <p class="small text-muted mb-0">Al finalizar la clase, todos los archivos y datos se destruyen permanentemente del servidor, protegiendo la privacidad de los menores.</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-sm p-4 mb-4 text-start bg-body-tertiary border-0">
-            <h5 class="text-secondary fs-6 text-uppercase mb-3 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Sobre Nuestra Plataforma Educativa</h5>
-            <p class="small text-muted mb-2">
-                <strong>compuclase.click</strong> es un Aula Virtual interactiva y gratuita diseñada para modernizar la forma en que los docentes imparten sus clases y cómo los estudiantes entregan sus tareas.
-            </p>
-            <p class="small text-muted mb-0">
-                Los profesores pueden lanzar encuestas, compartir fragmentos de código, proyectar relojes en vivo y recibir documentos que luego se descargan cómodamente ordenados. Además, por seguridad, todo archivo compartido se destruye permanentemente de nuestros servidores al finalizar la sesión de estudio.
-            </p>
+    <!-- SECCIÓN CÓMO FUNCIONA -->
+    <div class="container my-5 py-4">
+        <div class="card card-classroom p-4 p-md-5 rounded-4">
+            <h2 class="h3 fw-bold text-white mb-4 text-center"><i class="bi bi-sliders me-2 text-primary"></i>¿Cómo Funciona el Aula Virtual?</h2>
+            <div class="row g-4 text-start">
+                <div class="col-md-6 border-end border-secondary border-opacity-50 pe-md-4">
+                    <h4 class="text-info fw-bold h5 mb-3"><i class="bi bi-person-workspace me-2"></i>Para el Docente</h4>
+                    <ol class="text-light opacity-90 small leading-relaxed ps-3">
+                        <li class="mb-2"><strong>Ingresa al Panel de Profesor:</strong> Accede a <code>/admin.html</code> con tus credenciales de docente.</li>
+                        <li class="mb-2"><strong>Genera la Clave de Clase:</strong> Comparte el código de 6 letras con tus alumnos para que ingresen.</li>
+                        <li class="mb-2"><strong>Comparte Materiales y Proyecta Código:</strong> Sube guías o escribe fragmentos en la pizarra sincrónica.</li>
+                        <li class="mb-0"><strong>Recibe Trabajos y Descarga:</strong> Activa el Código de Envío, descarga el ZIP con el reporte y finaliza la clase.</li>
+                    </ol>
+                </div>
+                <div class="col-md-6 ps-md-4">
+                    <h4 class="text-success fw-bold h5 mb-3"><i class="bi bi-backpack me-2"></i>Para los Estudiantes</h4>
+                    <ol class="text-light opacity-90 small leading-relaxed ps-3">
+                        <li class="mb-2"><strong>Ingresa la Clave de Clase:</strong> Escribe el código en la pantalla principal para acceder.</li>
+                        <li class="mb-2"><strong>Descarga Materiales:</strong> Obtén las guías y observa la pizarra de código del profesor en vivo.</li>
+                        <li class="mb-2"><strong>Participa y Pregunta:</strong> Vota en las encuestas o envía dudas privadas al profesor.</li>
+                        <li class="mb-0"><strong>Envía tu Tarea:</strong> Ingresa tu nombre, grado, el Código de Envío y sube tu archivo antes de que finalice el reloj.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN GUÍAS Y ARTÍCULOS DESTACADOS -->
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="h4 text-white fw-bold mb-1"><i class="bi bi-journal-text me-2 text-primary"></i>Guías y Recursos Educativos</h3>
+                <p class="text-muted small mb-0">Artículos recomendados para potenciar la educación tecnológica en el aula.</p>
+            </div>
+            <a href="/guias-docentes.html" class="btn btn-outline-info btn-sm fw-bold">Ver Todas las Guías &rarr;</a>
         </div>
 
-        <footer class="mt-2 mb-3 text-center text-muted small">
-            &copy; 2026 Aula Virtual (v3.0). Un producto de <a href="https://bullstudio.online/" target="_blank" class="text-decoration-none fw-bold" style="color: #0d6efd;">bullstudio</a>
-        </footer>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <span class="badge bg-primary bg-opacity-25 text-primary w-auto mb-2 align-self-start">Pedagogía</span>
+                    <h5 class="text-white fw-bold mb-2">Metodologías Activas para la Enseñanza de Computación</h5>
+                    <p class="small text-muted mb-3">Estrategias didácticas y gestión del tiempo en laboratorios de informática para mejorar la concentración.</p>
+                    <a href="/guias-docentes.html" class="text-info small fw-bold text-decoration-none mt-auto">Leer Artículo Completo &rarr;</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <span class="badge bg-success bg-opacity-25 text-success w-auto mb-2 align-self-start">Estudiantes</span>
+                    <h5 class="text-white fw-bold mb-2">Manual de Buenas Prácticas para Entrega de Tareas</h5>
+                    <p class="small text-muted mb-3">Formatos recomendados (ZIP, PDF), compresión de archivos pesados y pautas de seguridad digital.</p>
+                    <a href="/recursos-estudiantes.html" class="text-success small fw-bold text-decoration-none mt-auto">Leer Guía del Alumno &rarr;</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-feature p-4 h-100 text-start">
+                    <span class="badge bg-warning bg-opacity-25 text-warning w-auto mb-2 align-self-start">Soporte</span>
+                    <h5 class="text-white fw-bold mb-2">Preguntas Frecuentes del Aula Virtual (FAQ)</h5>
+                    <p class="small text-muted mb-3">Respuestas claras sobre límites de tamaño, reportes Excel, códigos de envío y privacidad de datos.</p>
+                    <a href="/faq.html" class="text-warning small fw-bold text-decoration-none mt-auto">Consultar Preguntas &rarr;</a>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- FOOTER COMPLETO Y LEGAL -->
+    <footer class="py-5 text-muted small mt-5">
+        <div class="container">
+            <div class="row g-4 text-start mb-4">
+                <div class="col-lg-4">
+                    <h5 class="text-white fw-bold mb-2 d-flex align-items-center gap-2">
+                        <span>🎓</span> compuclase<span class="text-primary">.click</span>
+                    </h5>
+                    <p class="text-muted small mb-2">
+                        Plataforma de aula virtual interactiva, ligera y segura para instituciones educativas y docentes de informática.
+                    </p>
+                    <p class="text-muted small mb-0">&copy; 2026 <strong>compuclase.click</strong>. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Plataforma</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/" class="text-decoration-none text-muted">Inicio</a></li>
+                        <li class="mb-2"><a href="#aula-virtual" class="text-decoration-none text-muted">Acceso Alumno</a></li>
+                        <li class="mb-2"><a href="/admin.html" class="text-decoration-none text-muted">Panel Docente</a></li>
+                        <li class="mb-0"><a href="/sobre-nosotros.html" class="text-decoration-none text-muted">Sobre Nosotros</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <h6 class="text-white fw-bold mb-3">Recursos y Guías</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/guias-docentes.html" class="text-decoration-none text-muted">Guías para Docentes</a></li>
+                        <li class="mb-2"><a href="/recursos-estudiantes.html" class="text-decoration-none text-muted">Recursos de Estudiantes</a></li>
+                        <li class="mb-2"><a href="/faq.html" class="text-decoration-none text-muted">Preguntas Frecuentes</a></li>
+                        <li class="mb-0"><a href="/contacto.html" class="text-decoration-none text-muted">Soporte Técnico</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="text-white fw-bold mb-3">Legal y Privacidad</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/privacidad.html" class="text-decoration-none text-muted">Política de Privacidad</a></li>
+                        <li class="mb-2"><a href="/terminos.html" class="text-decoration-none text-muted">Términos de Servicio</a></li>
+                        <li class="mb-2"><a href="/cookies.html" class="text-decoration-none text-muted">Política de Cookies</a></li>
+                        <li class="mb-0"><a href="https://bullstudio.online/" target="_blank" class="text-decoration-none text-primary fw-bold">Desarrollo: bullstudio</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-top border-secondary border-opacity-25 pt-4 text-center">
+                <p class="small text-muted mb-0">
+                    Este sitio cumple con las políticas de editores de Google AdSense, normativas GDPR y principios de protección de la privacidad infantil en entornos escolares.
+                </p>
+            </div>
+        </div>
+    </footer>
     
     <!-- Modal Dudas -->
     <div class="modal fade" id="questionModal" tabindex="-1">
