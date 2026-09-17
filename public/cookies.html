@@ -21,6 +21,14 @@
         .legal-header { border-bottom: 2px solid #0d6efd; padding-bottom: 15px; margin-bottom: 25px; }
         footer { border-top: 1px solid rgba(255,255,255,0.1); background: #0b1120; }
     </style>
+    <!-- Script preventivo anti-parpadeo de tema -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="/css/theme.css">
 </head>
 <body>
 
@@ -43,6 +51,15 @@
                     <li class="nav-item"><a class="nav-link" href="/sobre-nosotros.html"><i class="bi bi-info-circle me-1"></i> Sobre Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacto.html"><i class="bi bi-envelope me-1"></i> Contacto</a></li>
                     <li class="nav-item ms-lg-2"><a class="btn btn-sm btn-primary fw-bold" href="/admin.html"><i class="bi bi-person-badge-fill me-1"></i> Acceso Docente</a></li>
+                                    <li class="nav-item ms-lg-2 d-flex align-items-center my-2 my-lg-0">
+                        <button class="theme-toggle-btn" type="button" aria-label="Cambiar tema" title="Alternar Modo Claro / Oscuro" onclick="toggleTheme()">
+                            <span class="theme-toggle-track">
+                                <span class="theme-toggle-icon theme-sun" title="Modo Claro"><i class="bi bi-sun-fill"></i></span>
+                                <span class="theme-toggle-icon theme-moon" title="Modo Oscuro"><i class="bi bi-moon-stars-fill"></i></span>
+                                <span class="theme-toggle-thumb"></span>
+                            </span>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -175,5 +192,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/theme.js"></script>
 </body>
 </html>
